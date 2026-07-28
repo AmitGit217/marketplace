@@ -8,14 +8,14 @@ model User {
 }
 
 model Vehicle {
-  vin               String   @id
+  id               String   @id
   brand             String
   model             String
   type              String
   manufactureYear   Int
   mileage           String
   condition         String
-  price             Decimal  @db.Decimal(10, 2)
+  price             Float
   acquisitionDate   DateTime
   status            String
   image             String
@@ -30,9 +30,9 @@ model Sale {
   paymentMethod String
   deliveryDate  DateTime
   userId        Int
-  vehicleVin    String   @unique
+  vehicleId     String   @unique
   user          User     @relation(fields: [userId], references: [id])
-  vehicle       Vehicle  @relation(fields: [vehicleVin], references: [vin])
+  vehicle       Vehicle  @relation(fields: [vehicleId], references: [id])
 
   @@map("sales")
 }
