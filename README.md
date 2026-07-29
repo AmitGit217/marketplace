@@ -1,21 +1,34 @@
-# AutoMarket
+# 🚗 Used Car Marketplace & CRM
 
-AutoMarket is a full-stack web application for managing a car dealership. Users can browse available vehicles, search and filter listings, purchase vehicles, and manage their purchase history. Administrators can manage vehicles, customers, and sales through a secure dashboard.
+## Overview
 
-The project was developed as a Full Stack application using **React** for the frontend and **NestJS** for the backend, following modern software architecture and development practices.
+Used Car Marketplace & CRM is a full-stack web application designed for small used car dealerships that still rely on spreadsheets, paper records, or messaging applications to manage their business.
+
+The platform centralizes vehicle inventory, sales management, customer information, and business analytics into a single modern application.
+
+The goal is to simplify dealership operations while providing an intuitive and responsive user experience.
 
 ---
 
 # Problem
 
-Many dealerships still rely on fragmented systems to manage inventory and sales. AutoMarket centralizes vehicle inventory, customer management, and sales into a single platform, providing an intuitive experience for both customers and administrators.
+Many small dealerships manage their inventory using Excel files and communicate with customers through WhatsApp, making it difficult to:
+
+* Keep vehicle information organized.
+* Track completed sales.
+* Know current inventory.
+* Analyze business performance.
+* Access customer purchase history.
+
+This application solves these problems through a centralized management system.
 
 ---
 
 # Target Audience
 
-* Customers looking to browse and purchase vehicles.
-* Dealership administrators managing inventory and sales.
+* Small used car dealerships
+* Independent vehicle sellers
+* Sales teams managing inventory and customers
 
 ---
 
@@ -24,73 +37,113 @@ Many dealerships still rely on fragmented systems to manage inventory and sales.
 ## Authentication
 
 * User registration
-* User login
-* JWT authentication
-* Password hashing with bcrypt
+* Secure login with JWT
+* Role-based authorization
 * Protected routes
-* Role-based authorization (Admin / Customer)
+
+Roles:
+
+* Administrator
+* Salesperson
 
 ---
 
-## Vehicles
+## Dashboard
 
-* Browse available vehicles
+The dashboard provides a quick overview of dealership activity.
+
+Includes:
+
+* Total vehicles in stock
+* Vehicles sold this month
+* Monthly revenue
+* Recent sales
+* Inventory summary
+
+---
+
+## Vehicle Management
+
+Complete inventory management system.
+
+Features:
+
+* Create vehicles
+* Edit vehicle information
+* Delete vehicles
+* Search by brand or model
+* Filter vehicles
+* Sort results
 * View vehicle details
-* Search by model or brand
-* Filter by:
+* Vehicle status
 
-  * Brand
-  * Vehicle type
-  * Year
-  * Price
-  * Mileage
-  * Fuel type
-* Pagination
+Vehicle statuses include:
+
+* Available
+* Reserved
+* Sold
 
 ---
 
-## Customers
+## Sales Management
 
-* User profile
+Sales can be registered directly from the platform.
+
+Each sale stores:
+
+* Customer
+* Vehicle
+* Sale date
+* Delivery date
+* Payment method
+
+Once a vehicle is sold, its status is automatically updated.
+
+---
+
+## Customer Management
+
+Each customer has their own profile where the dealership can view:
+
+* Personal information
 * Purchase history
-* Update personal information
+* Associated sales
 
 ---
 
-## Sales
+## Analytics
 
-* Purchase a vehicle
-* View sales history
-* Vehicle availability updates automatically after purchase
+Interactive charts display:
 
----
-
-## Administration
-
-* Manage vehicles (CRUD)
-* Manage customers
-* View all sales
-* Dashboard with dealership statistics
+* Sales per month
+* Revenue
+* Inventory statistics
+* Most sold brands
 
 ---
 
-# Database
+## Responsive Design
 
-The application uses **PostgreSQL** with **Prisma ORM**.
+The application is fully responsive and optimized for:
 
-## Tables
+* Desktop
+* Tablet
+* Mobile
 
-* Users
-* Vehicles
-* Sales
+---
 
-## Relationships
+## Dark Mode
 
-* One User can purchase multiple Vehicles.
-* One Vehicle can only belong to one Sale.
-* One Sale belongs to one User and one Vehicle.
+Users can switch between light and dark themes.
 
-The initial database is automatically populated from CSV files.
+---
+
+# Bonus Features
+
+* Cloudinary image upload
+* PDF export for sales reports
+* QR code generation for vehicle pages
+* Interactive charts using Recharts
 
 ---
 
@@ -103,100 +156,97 @@ The initial database is automatically populated from CSV files.
 * Chakra UI
 * Axios
 * React Hook Form
+* Zod
+* Recharts
+
+---
 
 ## Backend
 
-* NestJS
-* PostgreSQL
+* Node.js
+* Express.js
 * Prisma ORM
-* JWT
-* bcrypt
-* Class Validator
-* Multer (optional)
-* Cloudinary (optional)
+* PostgreSQL
+* JWT Authentication
+* Bcrypt
+
+---
+
+## Database
+
+The application uses PostgreSQL with Prisma ORM.
+
+Main collections:
+
+* Users
+* Vehicles
+* Sales
+
+Relationships:
+
+* One user can register multiple sales.
+* Each sale belongs to one vehicle.
+* Each vehicle can only be sold once.
+
+---
+
+# Database Initialization
+
+The database is populated using CSV files generated from an Excel spreadsheet containing more than 100 records.
+
+The seeding process uses Node.js file system utilities (`fs`) to read the CSV files and insert the data into PostgreSQL using Prisma.
 
 ---
 
 # Project Structure
 
 ```text
-automarket/
+frontend/
 │
-├── backend/
-│   ├── src/
-│   │   ├── auth/
-│   │   ├── users/
-│   │   ├── vehicles/
-│   │   ├── sales/
-│   │   ├── prisma/
-│   │   └── common/
-│   │
-│   ├── prisma/
-│   │   ├── schema.prisma
-│   │   └── seed.ts
-│   │
-│   └── package.json
+├── components/
+├── pages/
+├── hooks/
+├── context/
+├── services/
+├── routes/
+├── layouts/
+└── assets/
+
+backend/
 │
-├── frontend/
-│   ├── src/
-│   │   ├── components/
-│   │   ├── pages/
-│   │   ├── hooks/
-│   │   ├── services/
-│   │   ├── context/
-│   │   ├── theme/
-│   │   └── routes/
-│   │
-│   └── package.json
-│
-└── README.md
+├── controllers/
+├── routes/
+├── middleware/
+├── prisma/
+├── services/
+├── utils/
+└── generated/
 ```
 
 ---
 
-# Database Seed
+# User Experience
 
-The project includes three CSV files:
+The application focuses on:
 
-* `clientes.csv`
-* `vehiculos.csv`
-* `ventas.csv`
-
-A custom seed script reads each CSV file using Node.js (`fs`) and imports the data into PostgreSQL using Prisma.
-
----
-
-# Security
-
-* JWT Authentication
-* Password hashing with bcrypt
-* Protected API endpoints
-* Input validation using DTOs and class-validator
+* Clean interface
+* Fast navigation
+* Consistent design
+* Responsive layouts
+* Easy inventory management
+* Minimal number of clicks for common tasks
 
 ---
 
 # Future Improvements
 
-* Favorites
-* Vehicle comparison
-* Cloudinary image uploads
-* Advanced search filters
 * Email notifications
-* Stripe payment integration
-* Sales analytics dashboard
-* Responsive mobile application
-
----
-
-# Development Principles
-
-* Modular architecture
-* RESTful API
-* Clean code
-* Reusable React components
-* Type-safe backend with TypeScript
-* SOLID principles
-* Responsive UI
+* Vehicle reservation system
+* Customer appointments
+* Advanced reporting
+* Invoice generation
+* Vehicle maintenance tracking
+* Multi-dealership support
 
 ---
 
@@ -205,21 +255,48 @@ A custom seed script reads each CSV file using Node.js (`fs`) and imports the da
 ## Backend
 
 ```bash
-cd backend
 npm install
-npm run start:dev
+npm run dev
 ```
 
 ## Frontend
 
 ```bash
-cd frontend
 npm install
 npm run dev
 ```
 
 ---
 
-# Authors
+# Deployment
 
-Final Full Stack Project developed with React, NestJS, PostgreSQL, and Prisma.
+The project is deployed with separate frontend and backend services.
+
+Production includes:
+
+* Frontend deployment
+* Backend API deployment
+* PostgreSQL database
+* Cloudinary image hosting
+
+---
+
+# Learning Objectives
+
+This project demonstrates the practical application of:
+
+* Full-stack development
+* REST API design
+* Authentication and authorization
+* Relational database modeling
+* CSV data seeding
+* React architecture
+* State management
+* Responsive UI design
+* Modern backend practices
+
+---
+
+# Author
+
+Developed as the final Full-Stack project using **React**, **Node.js**, **Express**, **Prisma**, and **PostgreSQL**.
