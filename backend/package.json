@@ -30,6 +30,7 @@
     "@nestjs/platform-express": "^11.0.1",
     "@prisma/adapter-pg": "^7.9.1",
     "@prisma/client": "^7.9.1",
+    "bcrypt": "^6.0.0",
     "csvtojson": "^2.0.14",
     "dotenv": "^17.4.2",
     "pg": "^8.22.0",

@@ -3,6 +3,7 @@ import path from "path";
 import "dotenv/config";
 import { PrismaPg } from "@prisma/adapter-pg";
 import { PrismaClient } from "../generated/prisma/client";
+import * as bcrypt from "bcrypt";
 
 const connectionString = process.env.DATABASE_URL!;
 
@@ -58,6 +59,7 @@ async function main() {
       id: Number(u["ID cliente"]),
       name: u["Nombre del cliente"],
       email,
+      password: bcrypt.hashSync(Math.random().toString(36).substring(2, 15), 10),
       preferences: u["Preferencias del cliente"] || null,
     };
   });
