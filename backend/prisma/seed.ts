@@ -13,17 +13,9 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const dataPath = path.join(process.cwd(), "prisma", "data");
 
-  const users = await csv().fromFile(
-    path.join(dataPath, "users.csv")
-  );
-
-  const vehicles = await csv().fromFile(
-    path.join(dataPath, "vehicles.csv")
-  );
-
-  const sales = await csv().fromFile(
-    path.join(dataPath, "sales.csv")
-  );
+  const users = await csv().fromFile(path.join(dataPath, "users.csv"));
+  const vehicles = await csv().fromFile(path.join(dataPath, "vehicles.csv"));
+  const sales = await csv().fromFile(path.join(dataPath, "sales.csv"));
 
   console.log({
     users: users.length,
@@ -35,11 +27,11 @@ async function main() {
   await prisma.vehicle.deleteMany();
   await prisma.user.deleteMany();
 
-
   // USERS
   const usedEmails = new Set<string>();
+  const userIdMap = new Map<number, number>();
 
-  const usersData = users.map((u) => {
+  for (const u of users) {
     let email = u["Email"];
 
     if (usedEmails.has(email)) {
@@ -55,15 +47,20 @@ async function main() {
 
     usedEmails.add(email);
 
-    return {
-      id: Number(u["ID cliente"]),
-      name: u["Nombre del cliente"],
-      email,
-      password: bcrypt.hashSync(Math.random().toString(36).substring(2, 15), 10),
-      preferences: u["Preferencias del cliente"] || null,
-    };
-  });
+    const createdUser = await prisma.user.create({
+      data: {
+        name: u["Nombre del cliente"],
+        email,
+        password: bcrypt.hashSync(
+          Math.random().toString(36).substring(2, 15),
+          10,
+        ),
+        preferences: u["Preferencias del cliente"] || null,
+      },
+    });
 
+    userIdMap.set(Number(u["ID cliente"]), createdUser.id);
+  }
 
   // VEHICLES
   const vehiclesData = vehicles.map((v) => ({
@@ -81,17 +78,19 @@ async function main() {
     color: v["Color"],
   }));
 
+  await prisma.vehicle.createMany({
+    data: vehiclesData,
+  });
 
-  // SALES
-  const userIds = new Set(usersData.map((u) => u.id));
   const vehicleIds = new Set(vehiclesData.map((v) => v.id));
 
+  // SALES
   const salesData = sales
     .filter((s) => {
-      const validUser = userIds.has(Number(s["Cliente asociado"]));
-      const validVehicle = vehicleIds.has(s["Vehículo vendido"]);
+      const userId = userIdMap.get(Number(s["Cliente asociado"]));
+      const vehicleId = s["Vehículo vendido"];
 
-      if (!validUser || !validVehicle) {
+      if (!userId || !vehicleIds.has(vehicleId)) {
         console.log("Skipping invalid sale:", s);
         return false;
       }
@@ -99,27 +98,16 @@ async function main() {
       return true;
     })
     .map((s) => ({
-      id: Number(s["ID venta"]),
       saleDate: new Date(s["Fecha de venta"]),
       paymentMethod: s["Método de pago"],
       deliveryDate: new Date(s["Fecha de entrega"]),
-      userId: Number(s["Cliente asociado"]),
+      userId: userIdMap.get(Number(s["Cliente asociado"]))!,
       vehicleId: s["Vehículo vendido"],
     }));
-
-
-  await prisma.user.createMany({
-    data: usersData,
-  });
-
-  await prisma.vehicle.createMany({
-    data: vehiclesData,
-  });
 
   await prisma.sale.createMany({
     data: salesData,
   });
-
 
   console.log({
     usersInserted: await prisma.user.count(),

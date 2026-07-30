@@ -1,18 +1,38 @@
-import { Body, Controller, Post } from "@nestjs/common";
-import { AuthService } from "./auth.service";
+import {
+  Body,
+  Controller,
+  Get,
+  HttpCode,
+  HttpStatus,
+  Post,
+  Request,
+  UseGuards,
+} from "@nestjs/common";
+
 import type { User } from "../../../generated/prisma/client";
+import { AuthGuard } from "../../guards/auth.guard";
+import { AuthService } from "./auth.service";
+import { LoginDto, RegisterDto } from "./dto";
+import { CurrentUser } from "../../decorators/CurrentUser";
 
 @Controller("auth")
 export class AuthController {
-    constructor(private readonly authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-    @Post("register")
-    async register(@Body() userData: User) {
-        return await this.authService.registerUser(userData);
-    }
+  @Post("register")
+  register(@Body() userData: RegisterDto) {
+    return this.authService.registerUser(userData);
+  }
 
-    @Post("login")
-    async login(@Body() credentials: { email: string; password: string }) {
-        return await this.authService.loginUser(credentials.email, credentials.password);
+  @HttpCode(HttpStatus.OK)
+  @Post("login")
+  login(@Body() credentials: LoginDto) {
+    return this.authService.loginUser(credentials);
+  }
+
+    @Get("me")
+    @UseGuards(AuthGuard)
+    getProfile(@CurrentUser() user: User) {
+    return user;
     }
 }
