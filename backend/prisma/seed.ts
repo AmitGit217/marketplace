@@ -27,6 +27,16 @@ async function main() {
   await prisma.vehicle.deleteMany();
   await prisma.user.deleteMany();
 
+
+  await prisma.user.create({
+  data: {
+    name: "Admin",
+    email: "admin@example.com",
+    password: await bcrypt.hash("admin123", 10), // change in production
+    role: "admin", // or Role.ADMIN if using the generated enum
+  },
+});
+
   // USERS
   const usedEmails = new Set<string>();
   const userIdMap = new Map<number, number>();
