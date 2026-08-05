@@ -30,7 +30,7 @@ export class CreateVehicleDto {
   condition!: string;
 
   @IsDecimal()
-  price!: string; // class-validator expects a string
+  price!: string; 
 
   @IsDateString()
   acquisitionDate!: string;

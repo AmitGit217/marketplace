@@ -23,9 +23,13 @@ async function main() {
     sales: sales.length,
   });
 
-  await prisma.sale.deleteMany();
-  await prisma.vehicle.deleteMany();
-  await prisma.user.deleteMany();
+await prisma.$executeRawUnsafe(`
+  TRUNCATE TABLE
+    sales,
+    vehicles,
+    users
+  RESTART IDENTITY CASCADE;
+`);
 
 
   await prisma.user.create({

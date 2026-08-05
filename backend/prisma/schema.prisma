@@ -49,10 +49,8 @@ model Sale {
   saleDate      DateTime
   paymentMethod String
   deliveryDate  DateTime
-
   userId        Int
   vehicleId     String @unique
-
   user          User    @relation(fields: [userId], references: [id])
   vehicle       Vehicle @relation(fields: [vehicleId], references: [id])
 
