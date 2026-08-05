@@ -29,6 +29,18 @@ export class SalesService {
 
   async createSale(data: CreateSaleDto) {
     try {
+      const soled = await this.prismaService.sale.findMany({
+        where: {
+          vehicleId: data.vehicleId,
+        },
+      });
+
+      if (soled.length > 0) {
+        throw new BadRequestException(
+          `Vehicle with id ${data.vehicleId} has already been sold`
+        );
+      }
+
       return await this.prismaService.sale.create({
         data,
       });
