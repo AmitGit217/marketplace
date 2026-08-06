@@ -1,56 +1,79 @@
-import { Button, Field, Input, Stack } from "@chakra-ui/react";
+import { authApi } from "@/api/authApi";
+import type { LoginDto } from "@/types/auth";
+import {
+  Button,
+  Field,
+  IconButton,
+  Input,
+  InputGroup,
+  Stack,
+} from "@chakra-ui/react";
+import { useState } from "react";
 import { useForm } from "react-hook-form";
-
-interface LoginData {
-  userEmail: string;
-  userPassword: string;
-}
+import { LuEye, LuEyeOff } from "react-icons/lu";
 
 export function LoginForm() {
+  const [showPassword, setShowPassword] = useState(false);
+
   const {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm<LoginData>();
+  } = useForm<LoginDto>();
 
-  const onSubmit = (data: LoginData) => {
-    console.log(data);
+  const onSubmit = async (data: LoginDto) => {
+    try {
+      const response = await authApi.login(data);
+
+      console.log(response.user);
+    } catch (error) {
+      console.error(error);
+    }
   };
 
   return (
     <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={5}>
-        <Field.Root invalid={!!errors.userEmail}>
+        <Field.Root invalid={!!errors.email}>
           <Field.Label>Email</Field.Label>
 
           <Input
             type="email"
             autoComplete="new-email"
             spellCheck={false}
-            {...register("userEmail", {
+            {...register("email", {
               required: "Email is required",
             })}
           />
 
-          <Field.ErrorText>
-            {errors.userEmail?.message}
-          </Field.ErrorText>
+          <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.userPassword}>
+        <Field.Root invalid={!!errors.password}>
           <Field.Label>Password</Field.Label>
 
-          <Input
-            type="password"
-            autoComplete="new-password"
-            {...register("userPassword", {
-              required: "Password is required",
-            })}
-          />
+          <InputGroup
+            endElement={
+              <IconButton
+                variant="ghost"
+                size="sm"
+                aria-label={showPassword ? "Hide password" : "Show password"}
+                onClick={() => setShowPassword((v) => !v)}
+              >
+                {showPassword ? <LuEyeOff /> : <LuEye />}
+              </IconButton>
+            }
+          >
+            <Input
+              type={showPassword ? "text" : "password"}
+              autoComplete="new-password"
+              {...register("password", {
+                required: "Password is required",
+              })}
+            />
+          </InputGroup>
 
-          <Field.ErrorText>
-            {errors.userPassword?.message}
-          </Field.ErrorText>
+          <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
         </Field.Root>
 
         <Button

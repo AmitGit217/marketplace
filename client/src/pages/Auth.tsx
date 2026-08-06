@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { Button } from "@chakra-ui/react";
-import { AuthLayout } from "@/components/auth/authLayout";
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
+import { AuthLayout } from "@/components/auth/AuthLayout";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
