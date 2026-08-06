@@ -2,8 +2,8 @@ import { Button, Field, Input, Stack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 
 interface LoginData {
-  email: string;
-  password: string;
+  userEmail: string;
+  userPassword: string;
 }
 
 export function LoginForm() {
@@ -18,41 +18,45 @@ export function LoginForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={5}>
-        <Field.Root invalid={!!errors.email}>
+        <Field.Root invalid={!!errors.userEmail}>
           <Field.Label>Email</Field.Label>
 
           <Input
-            {...register("email", {
+            type="email"
+            autoComplete="new-email"
+            spellCheck={false}
+            {...register("userEmail", {
               required: "Email is required",
             })}
           />
 
           <Field.ErrorText>
-            {errors.email?.message}
+            {errors.userEmail?.message}
           </Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.password}>
+        <Field.Root invalid={!!errors.userPassword}>
           <Field.Label>Password</Field.Label>
 
           <Input
             type="password"
-            {...register("password", {
+            autoComplete="new-password"
+            {...register("userPassword", {
               required: "Password is required",
             })}
           />
 
           <Field.ErrorText>
-            {errors.password?.message}
+            {errors.userPassword?.message}
           </Field.ErrorText>
         </Field.Root>
 
         <Button
-          colorPalette="brand"
           type="submit"
           size="lg"
+          colorPalette="brand"
         >
           Login
         </Button>

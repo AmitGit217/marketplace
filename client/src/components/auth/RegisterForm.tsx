@@ -2,9 +2,9 @@ import { Button, Field, Input, Stack } from "@chakra-ui/react";
 import { useForm } from "react-hook-form";
 
 interface RegisterData {
-  name: string;
-  email: string;
-  password: string;
+  fullName: string;
+  userEmail: string;
+  userPassword: string;
 }
 
 export function RegisterForm() {
@@ -19,42 +19,48 @@ export function RegisterForm() {
   };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form autoComplete="off" onSubmit={handleSubmit(onSubmit)}>
       <Stack gap={5}>
-        <Field.Root invalid={!!errors.name}>
+        <Field.Root invalid={!!errors.fullName}>
           <Field.Label>Name</Field.Label>
 
           <Input
-            {...register("name", {
+            autoComplete="off"
+            spellCheck={false}
+            {...register("fullName", {
               required: "Name is required",
             })}
           />
 
           <Field.ErrorText>
-            {errors.name?.message}
+            {errors.fullName?.message}
           </Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.email}>
+        <Field.Root invalid={!!errors.userEmail}>
           <Field.Label>Email</Field.Label>
 
           <Input
-            {...register("email", {
+            type="email"
+            autoComplete="new-email"
+            spellCheck={false}
+            {...register("userEmail", {
               required: "Email is required",
             })}
           />
 
           <Field.ErrorText>
-            {errors.email?.message}
+            {errors.userEmail?.message}
           </Field.ErrorText>
         </Field.Root>
 
-        <Field.Root invalid={!!errors.password}>
+        <Field.Root invalid={!!errors.userPassword}>
           <Field.Label>Password</Field.Label>
 
           <Input
             type="password"
-            {...register("password", {
+            autoComplete="new-password"
+            {...register("userPassword", {
               required: "Password is required",
               minLength: {
                 value: 6,
@@ -64,7 +70,7 @@ export function RegisterForm() {
           />
 
           <Field.ErrorText>
-            {errors.password?.message}
+            {errors.userPassword?.message}
           </Field.ErrorText>
         </Field.Root>
 

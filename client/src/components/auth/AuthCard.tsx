@@ -14,18 +14,22 @@ export function AuthCard({
 }: Props) {
   return (
     <Box
-      bg="white"
-      p={8}
+      bg="surface"
+      p={{ base: 6, md: 8 }}
       rounded="xl"
-      shadow="card"
       borderWidth="1px"
       borderColor="border"
+      shadow="card"
+      backdropFilter="blur(12px)"
+      w="full"
     >
       <VStack align="stretch" gap={6}>
         <Box>
-          <Heading size="lg">{title}</Heading>
+          <Heading color="text" size="lg">
+            {title}
+          </Heading>
 
-          <Text mt={2} color="gray.500">
+          <Text mt={2} color="fg.muted">
             {subtitle}
           </Text>
         </Box>
