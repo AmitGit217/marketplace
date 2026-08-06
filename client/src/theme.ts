@@ -37,41 +37,76 @@ const config = defineConfig({
       },
     },
 
-    semanticTokens: {
-      colors: {
-        primary: {
-          value: "{colors.brand.500}",
-        },
+   semanticTokens: {
+  colors: {
+    primary: {
+      value: "{colors.brand.500}",
+    },
 
-        background: {
-          value: {
-            base: "#ffffff",
-            _dark: "#0F172A",
-          },
-        },
-
-        surface: {
-          value: {
-            base: "#F8FAFC",
-            _dark: "#1E293B",
-          },
-        },
-
-        border: {
-          value: {
-            base: "#E2E8F0",
-            _dark: "#334155",
-          },
-        },
-
-        text: {
-          value: {
-            base: "#1E293B",
-            _dark: "#F8FAFC",
-          },
-        },
+    background: {
+      value: {
+        base: "#F8FAFC",
+        _dark: "#0F172A",
       },
     },
+
+    surface: {
+      value: {
+        base: "#FFFFFF",
+        _dark: "#1E293B",
+      },
+    },
+
+    surfaceAlt: {
+      value: {
+        base: "#F1F5F9",
+        _dark: "#334155",
+      },
+    },
+
+    border: {
+      value: {
+        base: "#E2E8F0",
+        _dark: "#334155",
+      },
+    },
+
+    text: {
+      value: {
+        base: "#0F172A",
+        _dark: "#F8FAFC",
+      },
+    },
+
+    textMuted: {
+      value: {
+        base: "#64748B",
+        _dark: "#94A3B8",
+      },
+    },
+
+    success: {
+      value: {
+        base: "#16A34A",
+        _dark: "#22C55E",
+      },
+    },
+
+    warning: {
+      value: {
+        base: "#D97706",
+        _dark: "#F59E0B",
+      },
+    },
+
+    danger: {
+      value: {
+        base: "#DC2626",
+        _dark: "#EF4444",
+      },
+    },
+  },
+},
   },
 
   globalCss: {
