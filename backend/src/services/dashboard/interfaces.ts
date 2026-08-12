@@ -1,9 +1,23 @@
 export interface DashboardData {
-  totalVehicles: number;
-  availableVehicles: number;
-  soldVehicles: number;
-  monthlySales: number;
-  monthlyRevenue: number;
+  inventory: {
+    totalVehicles: number;
+    availableVehicles: number;
+    soldVehicles: number;
+  };
+
+  recent: {
+    period: "last30Days";
+    sales: number;
+    revenue: number;
+  };
+
+  yearly: {
+    year: number;
+    sales: number;
+    revenue: number;
+  }[];
+
+  dataThrough: Date | null;
 }
 
 export interface DashboardResponse {
