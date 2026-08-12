@@ -1,4 +1,4 @@
-import {  IsDateString, IsNumber, IsString } from "class-validator";
+import {  IsDateString, IsInt, IsNumber, IsString } from "class-validator";
 
 export class CreateSaleDto {
    @IsDateString()
@@ -13,6 +13,12 @@ export class CreateSaleDto {
    @IsNumber()
    userId!: number;
 
+
+  @IsInt()
+  clientId!: number;
+
    @IsString()
    vehicleId!: string;
+
+
  }

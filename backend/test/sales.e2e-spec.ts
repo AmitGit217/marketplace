@@ -1,6 +1,15 @@
-import { INestApplication, ValidationPipe } from "@nestjs/common";
+import {
+  INestApplication,
+  ValidationPipe,
+} from "@nestjs/common";
 import { Test } from "@nestjs/testing";
-import { afterAll, beforeAll, describe, expect, it } from "@jest/globals";
+import {
+  afterAll,
+  beforeAll,
+  describe,
+  expect,
+  it,
+} from "@jest/globals";
 import request from "supertest";
 
 import { AppModule } from "../src/app.module";
@@ -8,8 +17,10 @@ import { AppModule } from "../src/app.module";
 describe("Sales (e2e)", () => {
   let app: INestApplication;
   let adminToken: string;
+
   let saleId: number;
   let vehicleId: string;
+  let clientId: number;
 
   const userId = 1;
 
@@ -29,7 +40,8 @@ describe("Sales (e2e)", () => {
 
     await app.init();
 
-    const res = await request(app.getHttpServer())
+    // Login as admin
+    const login = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
         email: "admin@example.com",
@@ -37,7 +49,20 @@ describe("Sales (e2e)", () => {
       })
       .expect(200);
 
-    adminToken = res.body.token;
+    adminToken = login.body.token;
+
+    // Get an existing seeded clients
+    const clients = await request(app.getHttpServer())
+      .get("/clients")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect(200);
+
+    expect(Array.isArray(clients.body)).toBe(true);
+    expect(clients.body.length).toBeGreaterThan(0);
+
+    clientId = clients.body[0].id;
+
+    expect(clientId).toBeDefined();
   });
 
   afterAll(async () => {
@@ -66,6 +91,8 @@ describe("Sales (e2e)", () => {
       .expect(201);
 
     vehicleId = res.body.id;
+
+    expect(vehicleId).toBeDefined();
   });
 
   it("create sale", async () => {
@@ -74,16 +101,22 @@ describe("Sales (e2e)", () => {
       deliveryDate: "2026-08-06T00:00:00.000Z",
       paymentMethod: "Cash",
       userId,
+      clientId,
       vehicleId,
     };
 
-   const res = await request(app.getHttpServer())
-  .post("/sales")
-  .set("Authorization", `Bearer ${adminToken}`)
-  .send(sale);
-  saleId = res.body.id;
+    const res = await request(app.getHttpServer())
+      .post("/sales")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .send(sale)
+      .expect(201);
 
-  expect(res.status).toBe(201);
+    saleId = res.body.id;
+
+    expect(saleId).toBeDefined();
+    expect(res.body.vehicleId).toBe(vehicleId);
+    expect(res.body.userId).toBe(userId);
+    expect(res.body.clientId).toBe(clientId);
   });
 
   it("get sales", async () => {
@@ -93,6 +126,10 @@ describe("Sales (e2e)", () => {
       .expect(200);
 
     expect(Array.isArray(res.body)).toBe(true);
+
+    expect(
+      res.body.some((sale: any) => sale.id === saleId),
+    ).toBe(true);
   });
 
   it("get sale by id", async () => {
@@ -104,6 +141,7 @@ describe("Sales (e2e)", () => {
     expect(res.body.id).toBe(saleId);
     expect(res.body.vehicleId).toBe(vehicleId);
     expect(res.body.userId).toBe(userId);
+    expect(res.body.clientId).toBe(clientId);
   });
 
   it("delete sale", async () => {

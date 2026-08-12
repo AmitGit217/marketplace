@@ -14,10 +14,10 @@ import request from "supertest";
 
 import { AppModule } from "../src/app.module";
 
-describe("Users (e2e)", () => {
+describe("Client (e2e)", () => {
   let app: INestApplication;
   let adminToken: string;
-  let userId: number;
+  let clientId: number;
 
   beforeAll(async () => {
     const moduleRef = await Test.createTestingModule({
@@ -35,6 +35,7 @@ describe("Users (e2e)", () => {
 
     await app.init();
 
+    // Login as admin
     const login = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
@@ -45,84 +46,65 @@ describe("Users (e2e)", () => {
 
     adminToken = login.body.token;
 
-    // Create a user through the auth endpoint
-    const unique = Date.now();
+    // Get an existing seeded clients
+    const clients = await request(app.getHttpServer())
+      .get("/clients")
+      .set("Authorization", `Bearer ${adminToken}`)
+      .expect(200);
 
-    const res = await request(app.getHttpServer())
-      .post("/auth/register")
-      .send({
-        name: "Test User",
-        email: `user${unique}@example.com`,
-        password: "Password123!",
-      })
-      .expect(201);
+    expect(Array.isArray(clients.body)).toBe(true);
+    expect(clients.body.length).toBeGreaterThan(0);
 
-    userId = res.body.user.id;
+    clientId = clients.body[0].id;
 
-    expect(userId).toBeDefined();
-    expect(res.body.user.email).toBe(
-      `user${unique}@example.com`,
-    );
-    expect(res.body.token).toBeDefined();
+    expect(clientId).toBeDefined();
   });
 
   afterAll(async () => {
     await app.close();
   });
 
-  it("get users", async () => {
+  it("get clients", async () => {
     const res = await request(app.getHttpServer())
-      .get("/users")
+      .get("/clients")
       .set("Authorization", `Bearer ${adminToken}`)
       .expect(200);
 
     expect(Array.isArray(res.body)).toBe(true);
-    expect(res.body.some((u: any) => u.id === userId)).toBe(
-      true,
-    );
+
+    expect(
+      res.body.some((clients: any) => clients.id === clientId),
+    ).toBe(true);
   });
 
-  it("get user by id", async () => {
+  it("get clients by id", async () => {
     const res = await request(app.getHttpServer())
-      .get(`/users/${userId}`)
+      .get(`/clients/${clientId}`)
       .set("Authorization", `Bearer ${adminToken}`)
       .expect(200);
 
-    expect(res.body.id).toBe(userId);
+    expect(res.body.id).toBe(clientId);
   });
 
-  it("update user", async () => {
+  it("update clients", async () => {
     const res = await request(app.getHttpServer())
-      .patch(`/users/${userId}`)
+      .patch(`/clients/${clientId}`)
       .set("Authorization", `Bearer ${adminToken}`)
       .send({
-        name: "Updated",
+        name: "Updated Client",
       })
       .expect(200);
 
-    expect(res.body.name).toBe("Updated");
+    expect(res.body.id).toBe(clientId);
+    expect(res.body.name).toBe("Updated Client");
   });
 
-  it("get user sales", async () => {
+  it("get clients sales", async () => {
     const res = await request(app.getHttpServer())
-      .get(`/users/${userId}/sales`)
+      .get(`/clients/${clientId}/sales`)
       .set("Authorization", `Bearer ${adminToken}`)
       .expect(200);
 
     expect(Array.isArray(res.body)).toBe(true);
-  });
-
-  it("delete user", async () => {
-    await request(app.getHttpServer())
-      .delete(`/users/${userId}`)
-      .set("Authorization", `Bearer ${adminToken}`)
-      .expect(200);
-  });
-
-  it("user should not exist after delete", async () => {
-    await request(app.getHttpServer())
-      .get(`/users/${userId}`)
-      .set("Authorization", `Bearer ${adminToken}`)
-      .expect(404);
   });
 });
