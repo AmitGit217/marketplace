@@ -13,70 +13,74 @@ const prisma = new PrismaClient({ adapter });
 async function main() {
   const dataPath = path.join(process.cwd(), "prisma", "data");
 
-  const users = await csv().fromFile(path.join(dataPath, "users.csv"));
-  const vehicles = await csv().fromFile(path.join(dataPath, "vehicles.csv"));
-  const sales = await csv().fromFile(path.join(dataPath, "sales.csv"));
+  // The file is still called users.csv, but its data represents CLIENTS.
+  const clients = await csv().fromFile(
+    path.join(dataPath, "users.csv"),
+  );
+
+  const vehicles = await csv().fromFile(
+    path.join(dataPath, "vehicles.csv"),
+  );
+
+  const sales = await csv().fromFile(
+    path.join(dataPath, "sales.csv"),
+  );
 
   console.log({
-    users: users.length,
+    clients: clients.length,
     vehicles: vehicles.length,
     sales: sales.length,
   });
 
-await prisma.$executeRawUnsafe(`
-  TRUNCATE TABLE
-    sales,
-    vehicles,
-    users
-  RESTART IDENTITY CASCADE;
-`);
+  // Reset database
+  await prisma.$executeRawUnsafe(`
+    TRUNCATE TABLE
+      sales,
+      vehicles,
+      clients,
+      users
+    RESTART IDENTITY CASCADE;
+  `);
 
+  // --------------------------------------------------
+  // ADMIN USER
+  // --------------------------------------------------
 
-  await prisma.user.create({
-  data: {
-    name: "Admin",
-    email: "admin@example.com",
-    password: await bcrypt.hash("admin123", 10), // change in production
-    role: "admin", // or Role.ADMIN if using the generated enum
-  },
-});
+  const admin = await prisma.user.create({
+    data: {
+      name: "Admin",
+      email: "admin@example.com",
+      password: await bcrypt.hash("admin123", 10),
+      role: "admin",
+    },
+  });
 
-  // USERS
-  const usedEmails = new Set<string>();
-  const userIdMap = new Map<number, number>();
+  // --------------------------------------------------
+  // CLIENTS
+  // --------------------------------------------------
 
-  for (const u of users) {
-    let email = u["Email"];
+  const clientIdMap = new Map<number, number>();
 
-    if (usedEmails.has(email)) {
-      const [name, domain] = email.split("@");
-      let counter = 1;
-
-      while (usedEmails.has(`${name}+${counter}@${domain}`)) {
-        counter++;
-      }
-
-      email = `${name}+${counter}@${domain}`;
-    }
-
-    usedEmails.add(email);
-
-    const createdUser = await prisma.user.create({
+  for (const c of clients) {
+    const createdClient = await prisma.client.create({
       data: {
-        name: u["Nombre del cliente"],
-        email,
-        password: bcrypt.hashSync(
-          Math.random().toString(36).substring(2, 15),
-          10,
-        ),
-        preferences: u["Preferencias del cliente"] || null,
+        name: c["Nombre del cliente"],
+        email: c["Email"] || null,
+        preferences: c["Preferencias del cliente"] || null,
       },
     });
 
-    userIdMap.set(Number(u["ID cliente"]), createdUser.id);
+    // CSV client ID -> database client ID
+    clientIdMap.set(
+      Number(c["ID cliente"]),
+      createdClient.id,
+    );
   }
 
+  // --------------------------------------------------
   // VEHICLES
+  // --------------------------------------------------
+
   const vehiclesData = vehicles.map((v) => ({
     id: v["Número de identificación del vehículo (VIN)"],
     brand: v["Marca"],
@@ -96,15 +100,23 @@ await prisma.$executeRawUnsafe(`
     data: vehiclesData,
   });
 
-  const vehicleIds = new Set(vehiclesData.map((v) => v.id));
+  const vehicleIds = new Set(
+    vehiclesData.map((v) => v.id),
+  );
 
+  // --------------------------------------------------
   // SALES
+  // --------------------------------------------------
+
   const salesData = sales
     .filter((s) => {
-      const userId = userIdMap.get(Number(s["Cliente asociado"]));
+      const clientId = clientIdMap.get(
+        Number(s["Cliente asociado"]),
+      );
+
       const vehicleId = s["Vehículo vendido"];
 
-      if (!userId || !vehicleIds.has(vehicleId)) {
+      if (!clientId || !vehicleIds.has(vehicleId)) {
         console.log("Skipping invalid sale:", s);
         return false;
       }
@@ -115,7 +127,15 @@ await prisma.$executeRawUnsafe(`
       saleDate: new Date(s["Fecha de venta"]),
       paymentMethod: s["Método de pago"],
       deliveryDate: new Date(s["Fecha de entrega"]),
-      userId: userIdMap.get(Number(s["Cliente asociado"]))!,
+
+      // The authenticated user who registered the sale
+      userId: admin.id,
+
+      // The customer who bought the vehicle
+      clientId: clientIdMap.get(
+        Number(s["Cliente asociado"]),
+      )!,
+
       vehicleId: s["Vehículo vendido"],
     }));
 
@@ -123,8 +143,13 @@ await prisma.$executeRawUnsafe(`
     data: salesData,
   });
 
+  // --------------------------------------------------
+  // RESULTS
+  // --------------------------------------------------
+
   console.log({
     usersInserted: await prisma.user.count(),
+    clientsInserted: await prisma.client.count(),
     vehiclesInserted: await prisma.vehicle.count(),
     salesInserted: await prisma.sale.count(),
   });
