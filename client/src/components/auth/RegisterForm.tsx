@@ -11,6 +11,7 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LuEye, LuEyeOff } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 interface RegisterFormData {
   fullName: string;
@@ -20,6 +21,7 @@ interface RegisterFormData {
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -39,7 +41,7 @@ export function RegisterForm() {
 
       console.log(response.user);
 
-      // navigate("/dashboard");
+      navigate("/dashboard");
     } catch (error) {
 
       console.error(error);

@@ -1,6 +1,6 @@
 import { Routes, Route } from "react-router-dom";
 import Navbar from "./components/ui/navbar";
-import Home from "./pages/Home";
+import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 
 function App() {
@@ -10,7 +10,7 @@ function App() {
 
       <Routes>
         <Route path="/" element={<Auth />} />
-        <Route path="/home" element={<Home />} />
+        <Route path="/dashboard" element={<Dashboard />} />
       </Routes>
     </>
   );

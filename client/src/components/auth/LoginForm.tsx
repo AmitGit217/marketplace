@@ -11,9 +11,11 @@ import {
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { LuEye, LuEyeOff } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const navigate = useNavigate();
 
   const {
     register,
@@ -26,6 +28,7 @@ export function LoginForm() {
       const response = await authApi.login(data);
 
       console.log(response.user);
+      navigate("/dashboard");
     } catch (error) {
       console.error(error);
     }
