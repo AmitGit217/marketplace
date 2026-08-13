@@ -1,7 +1,10 @@
 import { useEffect, useState } from "react";
 
 import type { Vehicle } from "@/types/vehicle";
-import { ManagementTable, type TableColumn } from "@/components/management/managementTable";
+import {
+  ManagementTable,
+  type TableColumn,
+} from "@/components/management/managementTable";
 import { vehiclesApi } from "@/api/vehicles";
 
 const vehicleColumns: TableColumn<Vehicle>[] = [
@@ -24,12 +27,14 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
   {
     key: "mileage",
     label: "Mileage",
-    render: (value) => `${value.toLocaleString()} km`,
+    render: (value) =>
+      `${value.toLocaleString()} km`,
   },
   {
     key: "price",
     label: "Price",
-    render: (value) => `€${Number(value).toLocaleString()}`,
+    render: (value) =>
+      `€${Number(value).toLocaleString()}`,
   },
   {
     key: "status",
@@ -40,8 +45,6 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
 export default function Vehicles() {
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
-    console.log("🔥 VEHICLES PAGE MOUNTED");
-
 
   useEffect(() => {
     const loadVehicles = async () => {
@@ -56,14 +59,11 @@ export default function Vehicles() {
     loadVehicles();
   }, []);
 
-  if (isLoading) {
-    return <div>Loading vehicles...</div>;
-  }
-
   return (
     <ManagementTable
       data={vehicles}
       columns={vehicleColumns}
+      isLoading={isLoading}
     />
   );
 }
