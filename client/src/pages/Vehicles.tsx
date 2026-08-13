@@ -1,15 +1,8 @@
-import { ManagementTable, type TableColumn } from "@/components/management/ManagementTable";
+import { useEffect, useState } from "react";
 
-interface Vehicle {
-  id: string;
-  brand: string;
-  model: string;
-  type: string;
-  manufactureYear: number;
-  mileage: number;
-  price: number;
-  status: string;
-}
+import type { Vehicle } from "@/types/vehicle";
+import { ManagementTable, type TableColumn } from "@/components/management/managementTable";
+import { vehiclesApi } from "@/api/vehicles";
 
 const vehicleColumns: TableColumn<Vehicle>[] = [
   {
@@ -36,7 +29,7 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
   {
     key: "price",
     label: "Price",
-    render: (value) => `€${value.toLocaleString()}`,
+    render: (value) => `€${Number(value).toLocaleString()}`,
   },
   {
     key: "status",
@@ -45,38 +38,27 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
 ];
 
 export default function Vehicles() {
-  const vehicles: Vehicle[] = [
-    {
-      id: "1",
-      brand: "BMW",
-      model: "M3",
-      type: "Sedan",
-      manufactureYear: 2023,
-      mileage: 12000,
-      price: 65000,
-      status: "available",
-    },
-    {
-      id: "2",
-      brand: "Mercedes",
-      model: "C-Class",
-      type: "Sedan",
-      manufactureYear: 2024,
-      mileage: 8500,
-      price: 58000,
-      status: "available",
-    },
-    {
-      id: "3",
-      brand: "Audi",
-      model: "RS5",
-      type: "Coupe",
-      manufactureYear: 2022,
-      mileage: 21000,
-      price: 72000,
-      status: "sold",
-    },
-  ];
+  const [vehicles, setVehicles] = useState<Vehicle[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
+    console.log("🔥 VEHICLES PAGE MOUNTED");
+
+
+  useEffect(() => {
+    const loadVehicles = async () => {
+      try {
+        const data = await vehiclesApi.getAll();
+        setVehicles(data);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    loadVehicles();
+  }, []);
+
+  if (isLoading) {
+    return <div>Loading vehicles...</div>;
+  }
 
   return (
     <ManagementTable
