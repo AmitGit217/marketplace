@@ -8,6 +8,10 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
 
+  const handleSwitch = () => {
+    setIsLogin((prev) => !prev);
+  };
+
   return (
     <AuthLayout>
       <AuthCard
@@ -24,7 +28,7 @@ export default function Auth() {
           mt={6}
           variant="ghost"
           width="full"
-          onClick={() => setIsLogin(!isLogin)}
+          onClick={handleSwitch}
         >
           {isLogin
             ? "Don't have an account? Register"

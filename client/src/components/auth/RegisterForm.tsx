@@ -6,6 +6,7 @@ import {
   IconButton,
   Input,
   InputGroup,
+  Spinner,
   Stack,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -21,11 +22,13 @@ interface RegisterFormData {
 
 export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<RegisterFormData>();
 
@@ -36,15 +39,25 @@ export function RegisterForm() {
       password: data.userPassword,
     };
 
+    setIsLoading(true);
+
     try {
       const response = await authApi.register(registerData);
 
       console.log(response.user);
 
       navigate("/dashboard");
-    } catch (error) {
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message ||
+        "Registration failed. Please try again.";
 
-      console.error(error);
+      setError("root", {
+        type: "server",
+        message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -90,6 +103,7 @@ export function RegisterForm() {
           <InputGroup
             endElement={
               <IconButton
+                type="button"
                 variant="ghost"
                 size="sm"
                 aria-label={
@@ -119,12 +133,21 @@ export function RegisterForm() {
           </Field.ErrorText>
         </Field.Root>
 
+        {errors.root?.message && (
+          <Field.Root invalid>
+            <Field.ErrorText>
+              {errors.root.message}
+            </Field.ErrorText>
+          </Field.Root>
+        )}
+
         <Button
           colorPalette="brand"
           type="submit"
           size="lg"
+          disabled={isLoading}
         >
-          Register
+          {isLoading ? <Spinner size="sm" /> : "Register"}
         </Button>
       </Stack>
     </form>

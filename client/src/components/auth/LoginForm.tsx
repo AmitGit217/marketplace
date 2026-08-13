@@ -6,6 +6,7 @@ import {
   IconButton,
   Input,
   InputGroup,
+  Spinner,
   Stack,
 } from "@chakra-ui/react";
 import { useState } from "react";
@@ -15,22 +16,34 @@ import { useNavigate } from "react-router-dom";
 
 export function LoginForm() {
   const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
 
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm<LoginDto>();
 
   const onSubmit = async (data: LoginDto) => {
+    setIsLoading(true);
+
     try {
       const response = await authApi.login(data);
 
       console.log(response.user);
       navigate("/dashboard");
-    } catch (error) {
-      console.error(error);
+    } catch (error: any) {
+      const message =
+        error?.response?.data?.message || "Login failed. Please try again.";
+
+      setError("root", {
+        type: "server",
+        message,
+      });
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -49,7 +62,9 @@ export function LoginForm() {
             })}
           />
 
-          <Field.ErrorText>{errors.email?.message}</Field.ErrorText>
+          <Field.ErrorText>
+            {errors.email?.message}
+          </Field.ErrorText>
         </Field.Root>
 
         <Field.Root invalid={!!errors.password}>
@@ -58,9 +73,12 @@ export function LoginForm() {
           <InputGroup
             endElement={
               <IconButton
+                type="button"
                 variant="ghost"
                 size="sm"
-                aria-label={showPassword ? "Hide password" : "Show password"}
+                aria-label={
+                  showPassword ? "Hide password" : "Show password"
+                }
                 onClick={() => setShowPassword((v) => !v)}
               >
                 {showPassword ? <LuEyeOff /> : <LuEye />}
@@ -76,15 +94,26 @@ export function LoginForm() {
             />
           </InputGroup>
 
-          <Field.ErrorText>{errors.password?.message}</Field.ErrorText>
+          <Field.ErrorText>
+            {errors.password?.message}
+          </Field.ErrorText>
         </Field.Root>
+
+        {errors.root?.message && (
+          <Field.Root invalid>
+            <Field.ErrorText>
+              {errors.root.message}
+            </Field.ErrorText>
+          </Field.Root>
+        )}
 
         <Button
           type="submit"
           size="lg"
           colorPalette="brand"
+          disabled={isLoading}
         >
-          Login
+          {isLoading ? <Spinner size="sm" /> : "Login"}
         </Button>
       </Stack>
     </form>
