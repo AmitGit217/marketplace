@@ -1,4 +1,5 @@
 import { authApi } from "@/api/authApi";
+import { useAuth } from "@/context/authContext";
 import type { RegisterDto } from "@/types/auth";
 import {
   Button,
@@ -24,6 +25,8 @@ export function RegisterForm() {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const navigate = useNavigate();
+  const { login } = useAuth();
+
 
   const {
     register,
@@ -44,6 +47,7 @@ export function RegisterForm() {
     try {
       const response = await authApi.register(registerData);
 
+     await login();
       console.log(response.user);
 
       navigate("/dashboard");
