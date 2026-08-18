@@ -11,23 +11,38 @@ import { UpdateClientDto } from "./dto";
 export class ClientsService {
   constructor(private readonly prismaService: PrismaService) {}
 
-  async getClients() {
-    return this.prismaService.client.findMany();
-  }
+ async getClients() {
+  return this.prismaService.client.findMany({
+    orderBy: {
+      name: "asc",
+    },
+  });
+}
 
   async getClientById(id: number) {
-    const client = await this.prismaService.client.findUnique({
+  const client =
+    await this.prismaService.client.findUnique({
       where: { id },
+      include: {
+        sales: {
+          include: {
+            vehicle: true,
+          },
+          orderBy: {
+            saleDate: "desc",
+          },
+        },
+      },
     });
 
-    if (!client) {
-      throw new NotFoundException(
-        `Client with id ${id} not found`,
-      );
-    }
-
-    return client;
+  if (!client) {
+    throw new NotFoundException(
+      `Client with id ${id} not found`
+    );
   }
+
+  return client;
+}
 
   async updateClient(id: number, data: UpdateClientDto) {
     try {
