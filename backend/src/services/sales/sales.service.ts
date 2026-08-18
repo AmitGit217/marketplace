@@ -10,22 +10,37 @@ import { Prisma } from "../../../generated/prisma/client";
 @Injectable()
 export class SalesService {
   constructor(private readonly prismaService: PrismaService) {}
-
-  async getSales() {
-    return this.prismaService.sale.findMany();
-  }
+    async getSales() {
+      return this.prismaService.sale.findMany({
+        include: {
+          client: true,
+          vehicle: true,
+          user: true,
+        },
+        orderBy: {
+          saleDate: "desc",
+        },
+      });
+}
 
   async getSaleById(id: number) {
-    const sale = await this.prismaService.sale.findUnique({
-      where: { id },
-    });
+  const sale = await this.prismaService.sale.findUnique({
+    where: { id },
+    include: {
+      client: true,
+      vehicle: true,
+      user: true,
+    },
+  });
 
-    if (!sale) {
-      throw new NotFoundException(`Sale with id ${id} not found`);
-    }
-
-    return sale;
+  if (!sale) {
+    throw new NotFoundException(
+      `Sale with id ${id} not found`
+    );
   }
+
+  return sale;
+}
 
   async createSale(data: CreateSaleDto) {
     try {
