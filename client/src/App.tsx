@@ -11,6 +11,8 @@ import Sales from "./pages/Sales";
 import SaleDetails from "./components/SaleDetails";
 import Clients from "./pages/Clients";
 import ClientDetails from "./components/ClientDetails";
+import Personnel from "./pages/Personnel";
+import PersonnelDetails from "./components/PersonnelDetails";
 
 function App() {
   return (
@@ -34,6 +36,13 @@ function App() {
 
 
 
+<Route
+  path="/personnel"
+  element={<Personnel />}
+/>
+
+
+
 
         {/* Details */}
         <Route
@@ -44,6 +53,11 @@ function App() {
       <Route
   path="/clients/:id"
   element={<ClientDetails />}
+/>
+
+<Route
+  path="/personnel/:id"
+  element={<PersonnelDetails />}
 />
 
       </Routes>

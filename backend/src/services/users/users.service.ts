@@ -15,17 +15,31 @@ export class UsersService {
     return this.prismaService.user.findMany();
   }
 
-  async getUserById(id: number) {
-    const user = await this.prismaService.user.findUnique({
+ async getUserById(id: number) {
+  const user =
+    await this.prismaService.user.findUnique({
       where: { id },
+      include: {
+        sales: {
+          include: {
+            vehicle: true,
+            client: true,
+          },
+          orderBy: {
+            saleDate: "desc",
+          },
+        },
+      },
     });
 
-    if (!user) {
-      throw new NotFoundException(`User with id ${id} not found`);
-    }
-
-    return user;
+  if (!user) {
+    throw new NotFoundException(
+      `User with id ${id} not found`
+    );
   }
+
+  return user;
+}
 
   async updateUser(id: number, data: UpdateUserDto) {
     try {
