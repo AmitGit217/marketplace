@@ -1,11 +1,10 @@
 import { useEffect, useState } from "react";
 
 import type { Vehicle } from "@/types/vehicle";
-import {
-  ManagementTable,
-  type TableColumn,
-} from "@/components/management/managementTable";
+
 import { vehiclesApi } from "@/api/vehicles";
+import { ManagementTable, type TableColumn } from "@/components/management/ManagementTable";
+import { useNavigate } from "react-router-dom";
 
 const vehicleColumns: TableColumn<Vehicle>[] = [
   {
@@ -43,6 +42,8 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
 ];
 
 export default function Vehicles() {
+  const navigate = useNavigate();
+
   const [vehicles, setVehicles] = useState<Vehicle[]>([]);
   const [isLoading, setIsLoading] = useState(true);
 
@@ -64,6 +65,9 @@ export default function Vehicles() {
       data={vehicles}
       columns={vehicleColumns}
       isLoading={isLoading}
+      onRowClick={(vehicle) =>
+        navigate(`/vehicles/${vehicle.id}`)
+      }
     />
   );
 }

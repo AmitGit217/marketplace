@@ -32,6 +32,7 @@ interface ManagementTableProps<
   data: T[];
   columns: TableColumn<T>[];
   isLoading?: boolean;
+  onRowClick?: (row: T) => void;
 }
 
 type SortDirection = "asc" | "desc";
@@ -42,6 +43,7 @@ export function ManagementTable<
   data,
   columns,
   isLoading = false,
+  onRowClick,
 }: ManagementTableProps<T>) {
   const [sortKey, setSortKey] = useState<keyof T | null>(null);
   const [sortDirection, setSortDirection] =
@@ -381,34 +383,30 @@ export function ManagementTable<
             </Table.Row>
           </Table.Header>
 
-          <Table.Body>
-            {paginatedData.map((row) => (
-              <Table.Row
-                key={row.id}
-                cursor="pointer"
-                _hover={{
-                  bg: "blackAlpha.50",
-                  _dark: {
-                    bg: "whiteAlpha.50",
-                  },
-                }}
+      <Table.Body>
+        {paginatedData.map((row) => (
+          <Table.Row
+            key={row.id}
+            cursor={onRowClick ? "pointer" : "default"}
+            onClick={() => onRowClick?.(row)}
+            _hover={{
+              bg: "blackAlpha.50",
+              _dark: {
+                bg: "whiteAlpha.50",
+              },
+            }}
+          >
+            {columns.map((column) => (
+              <Table.Cell
+                key={String(column.key)}
+                whiteSpace="nowrap"
               >
-                {columns.map((column) => (
-                  <Table.Cell
-                    key={String(
-                      column.key
-                    )}
-                    whiteSpace="nowrap"
-                  >
-                    {renderCell(
-                      column,
-                      row
-                    )}
-                  </Table.Cell>
-                ))}
-              </Table.Row>
+                {renderCell(column, row)}
+              </Table.Cell>
             ))}
-          </Table.Body>
+          </Table.Row>
+        ))}
+      </Table.Body>
         </Table.Root>
       </Box>
 
@@ -420,22 +418,22 @@ export function ManagementTable<
       >
         <Flex direction="column" gap={3}>
           {paginatedData.map((row) => (
-            <Box
-              key={row.id}
-              borderWidth="1px"
-              borderRadius="xl"
-              p={4}
-              cursor="pointer"
-              transition="all 0.15s ease"
-              _hover={{
-                borderColor:
-                  "colorPalette.300",
-                shadow: "sm",
-              }}
-              _active={{
-                transform: "scale(0.99)",
-              }}
-            >
+          <Box
+          key={row.id}
+          borderWidth="1px"
+          borderRadius="xl"
+          p={4}
+          cursor={onRowClick ? "pointer" : "default"}
+          onClick={() => onRowClick?.(row)}
+          transition="all 0.15s ease"
+          _hover={{
+            borderColor: "colorPalette.300",
+            shadow: "sm",
+          }}
+          _active={{
+            transform: "scale(0.99)",
+          }}
+        >
               {columns.map(
                 (column, index) => (
                   <Box key={String(column.key)}>
