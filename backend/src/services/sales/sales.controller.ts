@@ -6,10 +6,15 @@ import {
   Param,
   ParseIntPipe,
   Post,
+  UseGuards,
 } from "@nestjs/common";
 import { SalesService } from "./sales.service";
 import { CreateSaleDto } from "./dto";
+import { CurrentUser } from "../../decorators/CurrentUser";
+import { AuthGuard } from "../../guards/auth.guard";
 
+
+@UseGuards(AuthGuard)
 @Controller("sales")
 export class SalesController {
   constructor(private readonly salesService: SalesService) {}
@@ -25,8 +30,8 @@ export class SalesController {
   }
 
   @Post()
-  createSale(@Body() createSaleDto: CreateSaleDto) {
-    return this.salesService.createSale(createSaleDto);
+  createSale(@Body() createSaleDto: CreateSaleDto, @CurrentUser() user: any) {
+    return this.salesService.createSale(createSaleDto, user);
   }
 
   @Delete(":id")

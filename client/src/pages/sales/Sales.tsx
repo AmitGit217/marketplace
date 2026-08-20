@@ -3,6 +3,8 @@ import { useNavigate } from "react-router-dom";
 
 import type { Sale } from "@/types/sale";
 import { salesApi } from "@/api/sales";
+import { Button, Flex } from "@chakra-ui/react";
+import { LuPlus } from "react-icons/lu";
 
 import {
   ManagementTable,
@@ -85,7 +87,18 @@ export default function Sales() {
     loadSales();
   }, []);
 
-  return (
+return (
+  <>
+    <Flex justify="flex-end" mb={4}>
+      <Button
+        colorPalette="brand"
+        onClick={() => navigate("/sales/new")}
+      >
+        <LuPlus />
+        Add sale
+      </Button>
+    </Flex>
+
     <ManagementTable
       data={sales}
       columns={saleColumns}
@@ -94,5 +107,6 @@ export default function Sales() {
         navigate(`/sales/${sale.id}`)
       }
     />
-  );
+  </>
+);
 }

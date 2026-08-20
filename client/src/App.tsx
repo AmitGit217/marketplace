@@ -7,14 +7,16 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 import VehicleDetails from "./pages/VehicleDetails";
 import Vehicles from "./pages/Vehicles";
-import Sales from "./pages/Sales";
-import SaleDetails from "./components/SaleDetails";
+import Sales from "./pages/sales/Sales";
+import SaleDetails from "./pages/sales/SaleDetails";
 import Clients from "./pages/clients/Clients";
 import ClientDetails from "./pages/clients/ClientDetails";
 import Personnel from "./pages/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
 import ClientEdit from "./pages/clients/ClientEdit";
 import ClientCreate from "./pages/clients/CreateClient";
+import SaleCreate from "./pages/sales/SaleCreate";
+import SaleEdit from "./pages/sales/SaleEdit";
 
 function App() {
   return (
@@ -71,7 +73,15 @@ function App() {
   path="/clients/new"
   element={<ClientCreate />}
 />
+<Route
+  path="/sales/new"
+  element={<SaleCreate />}
+/>
 
+<Route
+  path="/sales/:id/edit"
+  element={<SaleEdit />}
+/>
       </Routes>
 
       <ScrollToTopButton />

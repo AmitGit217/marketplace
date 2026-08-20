@@ -42,7 +42,7 @@ export class SalesService {
   return sale;
 }
 
-  async createSale(data: CreateSaleDto) {
+  async createSale(data: CreateSaleDto, user: any) {
     try {
       const soled = await this.prismaService.sale.findMany({
         where: {
@@ -57,7 +57,10 @@ export class SalesService {
       }
 
       return await this.prismaService.sale.create({
-        data,
+        data: {
+          ...data,
+          userId: user.sub,
+        },
       });
     } catch (error: any) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {

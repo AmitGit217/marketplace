@@ -10,8 +10,7 @@ export class CreateSaleDto {
    @IsString()
    paymentMethod!: string;
 
-   @IsNumber()
-   userId!: number;
+ 
 
 
   @IsInt()
