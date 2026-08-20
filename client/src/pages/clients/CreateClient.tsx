@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import { clientsApi } from "@/api/clients";
-import type { ClientFormData } from "../components/ClientForm";
-import ClientForm from "../components/ClientForm";
+import type { ClientFormData } from "@/components/ClientForm";
+import ClientForm from "@/components/ClientForm";
+
 
 
 export default function ClientCreate() {
