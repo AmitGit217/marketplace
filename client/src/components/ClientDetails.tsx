@@ -120,9 +120,9 @@ export default function ClientDetails() {
 
         <Button
           colorPalette="brand"
-          onClick={() => {
-            // edit later
-          }}
+          onClick={() =>
+    navigate(`/clients/${client.id}/edit`)
+}
         >
           <LuPencil />
           Edit client

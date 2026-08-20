@@ -13,6 +13,7 @@ import Clients from "./pages/Clients";
 import ClientDetails from "./components/ClientDetails";
 import Personnel from "./pages/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
+import ClientEdit from "./components/ClientEdit";
 
 function App() {
   return (
@@ -58,6 +59,11 @@ function App() {
 <Route
   path="/personnel/:id"
   element={<PersonnelDetails />}
+/>
+
+<Route
+  path="/clients/:id/edit"
+  element={<ClientEdit />}
 />
 
       </Routes>
