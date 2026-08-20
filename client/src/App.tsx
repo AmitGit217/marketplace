@@ -9,12 +9,12 @@ import VehicleDetails from "./pages/VehicleDetails";
 import Vehicles from "./pages/Vehicles";
 import Sales from "./pages/Sales";
 import SaleDetails from "./components/SaleDetails";
-import Clients from "./pages/Clients";
-import ClientDetails from "./components/ClientDetails";
+import Clients from "./pages/clients/Clients";
+import ClientDetails from "./pages/clients/ClientDetails";
 import Personnel from "./pages/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
-import ClientEdit from "./components/ClientEdit";
-import ClientCreate from "./pages/CreateClient";
+import ClientEdit from "./pages/clients/ClientEdit";
+import ClientCreate from "./pages/clients/CreateClient";
 
 function App() {
   return (
