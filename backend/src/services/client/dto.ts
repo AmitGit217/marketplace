@@ -13,3 +13,17 @@ export class UpdateClientDto {
   @IsString()
   preferences?: string;
 }
+
+
+export class CreateClientDto {
+  @IsString()
+  name!: string;
+
+  @IsOptional()
+  @IsString()
+  email?: string;
+
+  @IsOptional()
+  @IsString()
+  preferences?: string;
+}

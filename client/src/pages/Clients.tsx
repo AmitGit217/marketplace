@@ -1,5 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { Button, Flex } from "@chakra-ui/react";
+import { LuPlus } from "react-icons/lu";
 
 import type { Client } from "@/types/client";
 import { clientsApi } from "@/api/clients";
@@ -23,7 +25,9 @@ const clientColumns: TableColumn<Client>[] = [
     label: "Email",
     render: (value) => {
       if (value == null) return "-";
-      return typeof value === "string" || typeof value === "number"
+
+      return typeof value === "string" ||
+        typeof value === "number"
         ? String(value)
         : JSON.stringify(value);
     },
@@ -33,14 +37,19 @@ const clientColumns: TableColumn<Client>[] = [
     label: "Preferences",
     render: (value) => {
       if (value == null) return "-";
+
       if (Array.isArray(value)) {
         return value
           .map((item) =>
-            typeof item === "object" ? JSON.stringify(item) : String(item),
+            typeof item === "object"
+              ? JSON.stringify(item)
+              : String(item),
           )
           .join(", ");
       }
-      return typeof value === "string" || typeof value === "number"
+
+      return typeof value === "string" ||
+        typeof value === "number"
         ? value
         : String(value);
     },
@@ -67,13 +76,25 @@ export default function Clients() {
   }, []);
 
   return (
-    <ManagementTable
-      data={clients}
-      columns={clientColumns}
-      isLoading={isLoading}
-      onRowClick={(client) =>
-        navigate(`/clients/${client.id}`)
-      }
-    />
+    <>
+      <Flex justify="flex-end" mb={4}>
+        <Button
+          colorPalette="brand"
+          onClick={() => navigate("/clients/new")}
+        >
+          <LuPlus />
+          Add client
+        </Button>
+      </Flex>
+
+      <ManagementTable
+        data={clients}
+        columns={clientColumns}
+        isLoading={isLoading}
+        onRowClick={(client) =>
+          navigate(`/clients/${client.id}`)
+        }
+      />
+    </>
   );
 }

@@ -1,18 +1,26 @@
 import {
   Controller,
   Get,
+  Post,
   Patch,
   Delete,
   Param,
   Body,
   ParseIntPipe,
 } from "@nestjs/common";
+
 import { ClientsService } from "./clients.service";
-import { UpdateClientDto } from "./dto";
+
+import {
+  CreateClientDto,
+  UpdateClientDto,
+} from "./dto";
 
 @Controller("clients")
 export class ClientsController {
-  constructor(private readonly clientsService: ClientsService) {}
+  constructor(
+    private readonly clientsService: ClientsService,
+  ) {}
 
   @Get()
   async getClients() {
@@ -24,6 +32,13 @@ export class ClientsController {
     @Param("id", ParseIntPipe) id: number,
   ) {
     return this.clientsService.getClientById(id);
+  }
+
+  @Post()
+  async createClient(
+    @Body() data: CreateClientDto,
+  ) {
+    return this.clientsService.createClient(data);
   }
 
   @Patch(":id")

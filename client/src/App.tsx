@@ -14,6 +14,7 @@ import ClientDetails from "./components/ClientDetails";
 import Personnel from "./pages/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
 import ClientEdit from "./components/ClientEdit";
+import ClientCreate from "./pages/CreateClient";
 
 function App() {
   return (
@@ -64,6 +65,11 @@ function App() {
 <Route
   path="/clients/:id/edit"
   element={<ClientEdit />}
+/>
+
+<Route
+  path="/clients/new"
+  element={<ClientCreate />}
 />
 
       </Routes>
