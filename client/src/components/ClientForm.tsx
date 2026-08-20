@@ -9,98 +9,60 @@ import {
   Separator,
   Textarea,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useState } from "react";
 import { LuArrowLeft, LuSave } from "react-icons/lu";
 
-import type { Client } from "@/types/client";
-import { clientsApi } from "@/api/clients";
+export interface ClientFormData {
+  name: string;
+  email: string;
+  preferences: string;
+}
 
-export default function ClientEdit() {
-  const { id } = useParams();
-  const navigate = useNavigate();
+interface ClientFormProps {
+  title: string;
+  initialValues?: ClientFormData;
+  submitLabel: string;
+  isSaving: boolean;
+  onBack: () => void;
+  onSubmit: (data: ClientFormData) => Promise<void>;
+}
 
-  const [client, setClient] = useState<Client | null>(null);
+export default function ClientForm({
+  title,
+  initialValues,
+  submitLabel,
+  isSaving,
+  onBack,
+  onSubmit,
+}: ClientFormProps) {
+  const [name, setName] = useState(
+    initialValues?.name ?? "",
+  );
 
-  const [name, setName] = useState("");
-  const [email, setEmail] = useState("");
-  const [preferences, setPreferences] = useState("");
+  const [email, setEmail] = useState(
+    initialValues?.email ?? "",
+  );
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-
-  useEffect(() => {
-    const loadClient = async () => {
-      if (!id) {
-        setIsLoading(false);
-        return;
-      }
-
-      try {
-        const data = await clientsApi.getById(Number(id));
-
-        setClient(data);
-        setName(data.name ?? "");
-        setEmail(data.email ?? "");
-        setPreferences(data.preferences ?? "");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    loadClient();
-  }, [id]);
+  const [preferences, setPreferences] =
+    useState(
+      initialValues?.preferences ?? "",
+    );
 
   const handleSubmit = async (
-    event: React.FormEvent
+    event: React.FormEvent,
   ) => {
     event.preventDefault();
 
-    if (!id) return;
-
-    try {
-      setIsSaving(true);
-
-      await clientsApi.update(Number(id), {
-        name,
-        email,
-        preferences,
-      });
-
-      navigate(`/clients/${id}`);
-    } finally {
-      setIsSaving(false);
-    }
+    await onSubmit({
+      name,
+      email,
+      preferences,
+    });
   };
-
-  if (isLoading) {
-    return (
-      <Flex
-        minH="400px"
-        align="center"
-        justify="center"
-      >
-        Loading...
-      </Flex>
-    );
-  }
-
-  if (!client) {
-    return (
-      <Flex
-        minH="400px"
-        align="center"
-        justify="center"
-      >
-        Client not found
-      </Flex>
-    );
-  }
 
   return (
     <Box maxW="800px" mx="auto">
       <Flex
-        justify="space-between"
         align="center"
         mb={6}
       >
@@ -108,23 +70,25 @@ export default function ClientEdit() {
           variant="ghost"
           size="sm"
           onClick={() =>
-            navigate(`/clients/${id}`)
+            onBack()
           }
         >
           <LuArrowLeft />
-          Back to client
+          Back
         </Button>
-
-        <Heading size="lg">
-          Edit client
-        </Heading>
       </Flex>
+
+      <Heading size="lg" mb={6}>
+        {title}
+      </Heading>
 
       <Card.Root
         borderRadius="2xl"
         shadow="sm"
       >
-        <Card.Body p={{ base: 5, md: 8 }}>
+        <Card.Body
+          p={{ base: 5, md: 8 }}
+        >
           <form onSubmit={handleSubmit}>
             <Flex
               direction="column"
@@ -140,7 +104,7 @@ export default function ClientEdit() {
                   onChange={(e) =>
                     setName(e.target.value)
                   }
-                  placeholder="Client name"
+                  placeholder="John Smith"
                 />
               </Field.Root>
 
@@ -155,7 +119,7 @@ export default function ClientEdit() {
                   onChange={(e) =>
                     setEmail(e.target.value)
                   }
-                  placeholder="client@email.com"
+                  placeholder="john@example.com"
                 />
               </Field.Root>
 
@@ -170,7 +134,7 @@ export default function ClientEdit() {
                   value={preferences}
                   onChange={(e) =>
                     setPreferences(
-                      e.target.value
+                      e.target.value,
                     )
                   }
                   placeholder="Client preferences..."
@@ -184,13 +148,11 @@ export default function ClientEdit() {
                 mt={3}
               >
                 <Button
+                  type="button"
                   variant="outline"
                   onClick={() =>
-                    navigate(
-                      `/clients/${id}`
-                    )
+                    onBack()
                   }
-                  type="button"
                 >
                   Cancel
                 </Button>
@@ -199,9 +161,10 @@ export default function ClientEdit() {
                   type="submit"
                   colorPalette="brand"
                   loading={isSaving}
+                  disabled={!name.trim()}
                 >
                   <LuSave />
-                  Save changes
+                  {submitLabel}
                 </Button>
               </Flex>
             </Flex>
