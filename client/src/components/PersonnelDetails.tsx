@@ -119,14 +119,14 @@ export default function PersonnelDetails() {
         </Button>
 
         <Button
-          colorPalette="brand"
-          onClick={() => {
-            // Edit later
-          }}
-        >
-          <LuPencil />
-          Edit personnel
-        </Button>
+  colorPalette="brand"
+  onClick={() =>
+    navigate(`/personnel/${person.id}/edit`)
+  }
+>
+  <LuPencil />
+  Edit personnel
+</Button>
       </Flex>
 
       {/* Personnel overview */}

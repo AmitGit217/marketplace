@@ -5,7 +5,7 @@ import {
 } from "@nestjs/common";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma";
-import { UpdateUserDto } from "./dto";
+import { CreateUserDto, UpdateUserDto } from "./dto";
 
 @Injectable()
 export class UsersService {
@@ -13,6 +13,25 @@ export class UsersService {
 
   async getUsers() {
     return this.prismaService.user.findMany();
+  }
+
+   async createUser(data: CreateUserDto) {
+    try {
+      return await this.prismaService.user.create({
+        data,
+      });
+    } catch (error) {
+      if (
+        error instanceof Prisma.PrismaClientKnownRequestError &&
+        error.code === "P2002"
+      ) {
+        throw new BadRequestException(
+          "A user with this email already exists",
+        );
+      }
+
+      throw new BadRequestException();
+    }
   }
 
  async getUserById(id: number) {

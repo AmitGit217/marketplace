@@ -25,3 +25,23 @@ export class UpdateUserDto {
   @IsString()
   role?: string;
 }
+
+
+export class CreateUserDto {
+  @IsString()
+  name!: string;
+
+  @IsEmail()
+  email!: string;
+
+  @IsString()
+  password!: string;
+
+  @IsOptional()
+  @IsString()
+  preferences?: string;
+
+  @IsOptional()
+  @IsString()
+  role?: string;
+}

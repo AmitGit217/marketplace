@@ -11,12 +11,14 @@ import Sales from "./pages/sales/Sales";
 import SaleDetails from "./pages/sales/SaleDetails";
 import Clients from "./pages/clients/Clients";
 import ClientDetails from "./pages/clients/ClientDetails";
-import Personnel from "./pages/Personnel";
+import Personnel from "./pages/personnel/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
 import ClientEdit from "./pages/clients/ClientEdit";
 import ClientCreate from "./pages/clients/CreateClient";
 import SaleCreate from "./pages/sales/SaleCreate";
 import SaleEdit from "./pages/sales/SaleEdit";
+import PersonnelCreate from "./pages/personnel/PersonnelCreate";
+import PersonnelEdit from "./pages/personnel/PersonnelEdit";
 
 function App() {
   return (
@@ -81,6 +83,21 @@ function App() {
 <Route
   path="/sales/:id/edit"
   element={<SaleEdit />}
+/>
+
+<Route
+  path="/personnel"
+  element={<Personnel />}
+/>
+
+<Route
+  path="/personnel/create"
+  element={<PersonnelCreate />}
+/>
+
+<Route
+  path="/personnel/:id/edit"
+  element={<PersonnelEdit />}
 />
       </Routes>
 

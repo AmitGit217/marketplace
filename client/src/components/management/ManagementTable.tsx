@@ -9,7 +9,11 @@ import {
   Table,
   Text,
 } from "@chakra-ui/react";
-import { useMemo, useState, type ReactNode } from "react";
+import {
+  useMemo,
+  useState,
+  type ReactNode,
+} from "react";
 import {
   LuChevronDown,
   LuChevronLeft,
@@ -23,7 +27,10 @@ export interface TableColumn<
 > {
   key: K;
   label: string;
-  render?: (value: T[K], row: T) => ReactNode;
+  render?: (
+    value: T[K],
+    row: T
+  ) => ReactNode;
 }
 
 interface ManagementTableProps<
@@ -33,6 +40,7 @@ interface ManagementTableProps<
   columns: TableColumn<T>[];
   isLoading?: boolean;
   onRowClick?: (row: T) => void;
+  actions?: (row: T) => ReactNode;
 }
 
 type SortDirection = "asc" | "desc";
@@ -44,13 +52,19 @@ export function ManagementTable<
   columns,
   isLoading = false,
   onRowClick,
+  actions,
 }: ManagementTableProps<T>) {
-  const [sortKey, setSortKey] = useState<keyof T | null>(null);
+  const [sortKey, setSortKey] =
+    useState<keyof T | null>(null);
+
   const [sortDirection, setSortDirection] =
     useState<SortDirection>("asc");
 
-  const [pageSize, setPageSize] = useState(10);
-  const [currentPage, setCurrentPage] = useState(1);
+  const [pageSize, setPageSize] =
+    useState(10);
+
+  const [currentPage, setCurrentPage] =
+    useState(1);
 
   /*
    * Sorting
@@ -77,8 +91,12 @@ export function ManagementTable<
       }
 
       return sortDirection === "asc"
-        ? String(aValue).localeCompare(String(bValue))
-        : String(bValue).localeCompare(String(aValue));
+        ? String(aValue).localeCompare(
+            String(bValue)
+          )
+        : String(bValue).localeCompare(
+            String(aValue)
+          );
     });
   }, [data, sortKey, sortDirection]);
 
@@ -87,7 +105,9 @@ export function ManagementTable<
    */
   const totalPages = Math.max(
     1,
-    Math.ceil(sortedData.length / pageSize)
+    Math.ceil(
+      sortedData.length / pageSize
+    )
   );
 
   const safeCurrentPage = Math.min(
@@ -115,7 +135,9 @@ export function ManagementTable<
   const handleSort = (key: keyof T) => {
     if (sortKey === key) {
       setSortDirection((previous) =>
-        previous === "asc" ? "desc" : "asc"
+        previous === "asc"
+          ? "desc"
+          : "asc"
       );
     } else {
       setSortKey(key);
@@ -131,7 +153,9 @@ export function ManagementTable<
   const handlePageSizeChange = (
     event: React.ChangeEvent<HTMLSelectElement>
   ) => {
-    setPageSize(Number(event.target.value));
+    setPageSize(
+      Number(event.target.value)
+    );
     setCurrentPage(1);
   };
 
@@ -201,10 +225,15 @@ export function ManagementTable<
     row: T
   ) => {
     return column.render ? (
-      column.render(row[column.key], row)
+      column.render(
+        row[column.key],
+        row
+      )
     ) : (
       <Text>
-        {String(row[column.key] ?? "-")}
+        {String(
+          row[column.key] ?? "-"
+        )}
       </Text>
     );
   };
@@ -217,15 +246,24 @@ export function ManagementTable<
       <Flex
         mb={4}
         justify="space-between"
-        align={{ base: "stretch", md: "center" }}
-        direction={{ base: "column", md: "row" }}
+        align={{
+          base: "stretch",
+          md: "center",
+        }}
+        direction={{
+          base: "column",
+          md: "row",
+        }}
         gap={3}
       >
         {/* SORT */}
         <Flex
           align="center"
           gap={2}
-          width={{ base: "full", md: "auto" }}
+          width={{
+            base: "full",
+            md: "auto",
+          }}
         >
           <Text
             fontSize="sm"
@@ -237,7 +275,10 @@ export function ManagementTable<
 
           <NativeSelect.Root
             size="sm"
-            width={{ base: "full", md: "180px" }}
+            width={{
+              base: "full",
+              md: "180px",
+            }}
           >
             <NativeSelect.Field
               value={
@@ -266,8 +307,12 @@ export function ManagementTable<
 
               {columns.map((column) => (
                 <option
-                  key={String(column.key)}
-                  value={String(column.key)}
+                  key={String(
+                    column.key
+                  )}
+                  value={String(
+                    column.key
+                  )}
                 >
                   {column.label}
                 </option>
@@ -285,7 +330,8 @@ export function ManagementTable<
               }
               aria-label="Change sort direction"
             >
-              {sortDirection === "asc" ? (
+              {sortDirection ===
+              "asc" ? (
                 <LuChevronUp />
               ) : (
                 <LuChevronDown />
@@ -317,10 +363,21 @@ export function ManagementTable<
                 handlePageSizeChange
               }
             >
-              <option value={5}>5</option>
-              <option value={10}>10</option>
-              <option value={25}>25</option>
-              <option value={50}>50</option>
+              <option value={5}>
+                5
+              </option>
+
+              <option value={10}>
+                10
+              </option>
+
+              <option value={25}>
+                25
+              </option>
+
+              <option value={50}>
+                50
+              </option>
             </NativeSelect.Field>
           </NativeSelect.Root>
         </Flex>
@@ -330,7 +387,10 @@ export function ManagementTable<
           DESKTOP TABLE
       ========================= */}
       <Box
-        display={{ base: "none", md: "block" }}
+        display={{
+          base: "none",
+          md: "block",
+        }}
         overflowX="auto"
         borderWidth="1px"
         borderRadius="xl"
@@ -344,11 +404,14 @@ export function ManagementTable<
             <Table.Row>
               {columns.map((column) => {
                 const isSorted =
-                  sortKey === column.key;
+                  sortKey ===
+                  column.key;
 
                 return (
                   <Table.ColumnHeader
-                    key={String(column.key)}
+                    key={String(
+                      column.key
+                    )}
                     whiteSpace="nowrap"
                     cursor="pointer"
                     userSelect="none"
@@ -380,33 +443,64 @@ export function ManagementTable<
                   </Table.ColumnHeader>
                 );
               })}
+
+              {actions && (
+                <Table.ColumnHeader textAlign="right">
+                  Actions
+                </Table.ColumnHeader>
+              )}
             </Table.Row>
           </Table.Header>
 
-      <Table.Body>
-        {paginatedData.map((row) => (
-          <Table.Row
-            key={row.id}
-            cursor={onRowClick ? "pointer" : "default"}
-            onClick={() => onRowClick?.(row)}
-            _hover={{
-              bg: "blackAlpha.50",
-              _dark: {
-                bg: "whiteAlpha.50",
-              },
-            }}
-          >
-            {columns.map((column) => (
-              <Table.Cell
-                key={String(column.key)}
-                whiteSpace="nowrap"
+          <Table.Body>
+            {paginatedData.map((row) => (
+              <Table.Row
+                key={row.id}
+                cursor={
+                  onRowClick
+                    ? "pointer"
+                    : "default"
+                }
+                onClick={() =>
+                  onRowClick?.(row)
+                }
+                _hover={{
+                  bg: "blackAlpha.50",
+                  _dark: {
+                    bg: "whiteAlpha.50",
+                  },
+                }}
               >
-                {renderCell(column, row)}
-              </Table.Cell>
+                {columns.map(
+                  (column) => (
+                    <Table.Cell
+                      key={String(
+                        column.key
+                      )}
+                      whiteSpace="nowrap"
+                    >
+                      {renderCell(
+                        column,
+                        row
+                      )}
+                    </Table.Cell>
+                  )
+                )}
+
+                {actions && (
+                  <Table.Cell textAlign="right">
+                    <Box
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                    >
+                      {actions(row)}
+                    </Box>
+                  </Table.Cell>
+                )}
+              </Table.Row>
             ))}
-          </Table.Row>
-        ))}
-      </Table.Body>
+          </Table.Body>
         </Table.Root>
       </Box>
 
@@ -414,29 +508,47 @@ export function ManagementTable<
           MOBILE CARDS
       ========================= */}
       <Box
-        display={{ base: "block", md: "none" }}
+        display={{
+          base: "block",
+          md: "none",
+        }}
       >
-        <Flex direction="column" gap={3}>
-          {paginatedData.map((row) => (
-          <Box
-          key={row.id}
-          borderWidth="1px"
-          borderRadius="xl"
-          p={4}
-          cursor={onRowClick ? "pointer" : "default"}
-          onClick={() => onRowClick?.(row)}
-          transition="all 0.15s ease"
-          _hover={{
-            borderColor: "colorPalette.300",
-            shadow: "sm",
-          }}
-          _active={{
-            transform: "scale(0.99)",
-          }}
+        <Flex
+          direction="column"
+          gap={3}
         >
+          {paginatedData.map((row) => (
+            <Box
+              key={row.id}
+              borderWidth="1px"
+              borderRadius="xl"
+              p={4}
+              cursor={
+                onRowClick
+                  ? "pointer"
+                  : "default"
+              }
+              onClick={() =>
+                onRowClick?.(row)
+              }
+              transition="all 0.15s ease"
+              _hover={{
+                borderColor:
+                  "colorPalette.300",
+                shadow: "sm",
+              }}
+              _active={{
+                transform:
+                  "scale(0.99)",
+              }}
+            >
               {columns.map(
                 (column, index) => (
-                  <Box key={String(column.key)}>
+                  <Box
+                    key={String(
+                      column.key
+                    )}
+                  >
                     {index > 0 && (
                       <Separator my={3} />
                     )}
@@ -468,6 +580,22 @@ export function ManagementTable<
                   </Box>
                 )
               )}
+
+              {actions && (
+                <>
+                  <Separator my={3} />
+
+                  <Flex justify="flex-end">
+                    <Box
+                      onClick={(event) =>
+                        event.stopPropagation()
+                      }
+                    >
+                      {actions(row)}
+                    </Box>
+                  </Flex>
+                </>
+              )}
             </Box>
           ))}
         </Flex>
@@ -491,7 +619,7 @@ export function ManagementTable<
           color="fg.muted"
         >
           {(safeCurrentPage - 1) *
-              pageSize +
+            pageSize +
             1}{" "}
           –{" "}
           {Math.min(
@@ -502,7 +630,12 @@ export function ManagementTable<
           of {sortedData.length}
         </Text>
 
-        <HStack width={{ base: "full", sm: "auto" }}>
+        <HStack
+          width={{
+            base: "full",
+            sm: "auto",
+          }}
+        >
           <Button
             size="sm"
             variant="outline"
@@ -521,6 +654,7 @@ export function ManagementTable<
             }
           >
             <LuChevronLeft />
+
             <Text
               display={{
                 base: "none",
@@ -566,6 +700,7 @@ export function ManagementTable<
             >
               Next
             </Text>
+
             <LuChevronRight />
           </Button>
         </HStack>

@@ -6,13 +6,13 @@ import {
   Param,
   ParseIntPipe,
   Patch,
+  Post,
   UseGuards,
 } from "@nestjs/common";
-import { Prisma } from "../../../generated/prisma/client";
+
 import { UsersService } from "./users.service";
 import { AuthGuard } from "../../guards/auth.guard";
-import { UpdateUserDto } from "./dto";
-
+import { CreateUserDto, UpdateUserDto } from "./dto";
 
 @UseGuards(AuthGuard)
 @Controller("users")
@@ -27,6 +27,11 @@ export class UsersController {
   @Get(":id")
   getUserById(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.getUserById(id);
+  }
+
+  @Post()
+  createUser(@Body() data: CreateUserDto) {
+    return this.usersService.createUser(data);
   }
 
   @Patch(":id")
