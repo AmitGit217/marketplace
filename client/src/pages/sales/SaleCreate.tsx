@@ -4,23 +4,38 @@ import { useNavigate } from "react-router-dom";
 import { salesApi } from "@/api/sales";
 import { vehiclesApi } from "@/api/vehicles";
 import { clientsApi } from "@/api/clients";
+
 import type { SaleFormData } from "@/components/SalesFrom";
 import SaleForm from "@/components/SalesFrom";
+import { Box } from "@chakra-ui/react";
 
+interface VehicleOption {
+  id: string;
+  brand: string;
+  model: string;
+  type: string;
+  manufactureYear: number;
+  mileage: number;
+  condition: string;
+  price: number;
+  status: string;
+  image: string;
+  color: string;
+}
 
+interface ClientOption {
+  id: number;
+  label: string;
+}
 
 export default function SaleCreate() {
   const navigate = useNavigate();
 
   const [vehicles, setVehicles] =
-    useState<
-      { id: number | string; label: string }[]
-    >([]);
+    useState<VehicleOption[]>([]);
 
   const [clients, setClients] =
-    useState<
-      { id: number | string; label: string }[]
-    >([]);
+    useState<ClientOption[]>([]);
 
   const [isLoading, setIsLoading] =
     useState(true);
@@ -37,10 +52,23 @@ export default function SaleCreate() {
             clientsApi.getAll(),
           ]);
 
+        // Only vehicles available for sale
+        const availableVehicles =
+          vehicleData
+            .filter(
+              (vehicle) =>
+                vehicle.status === "Available",
+            )
+            .sort(
+              (a, b) =>
+                b.manufactureYear -
+                a.manufactureYear,
+            );
+
         setVehicles(
-          vehicleData.map((vehicle) => ({
-            id: vehicle.id,
-            label: `${vehicle.brand} ${vehicle.model}`,
+          availableVehicles.map((vehicle) => ({
+            ...vehicle,
+            price: Number(vehicle.price),
           })),
         );
 
@@ -65,13 +93,13 @@ export default function SaleCreate() {
       setIsSaving(true);
 
       const sale =
-       await salesApi.create({
-  vehicleId: data.vehicleId,
-  clientId: Number(data.clientId),
-  saleDate: data.saleDate,
-  paymentMethod: data.paymentMethod,
-  deliveryDate: data.deliveryDate,
-});
+        await salesApi.create({
+          vehicleId: data.vehicleId,
+          clientId: Number(data.clientId),
+          saleDate: data.saleDate,
+          paymentMethod: data.paymentMethod,
+          deliveryDate: data.deliveryDate,
+        });
 
       navigate(`/sales/${sale.id}`);
     } finally {
@@ -83,16 +111,24 @@ export default function SaleCreate() {
     return <div>Loading...</div>;
   }
 
-  return (
-    
+return (
+  <Box
+    minH="100vh"
+    display="flex"
+    alignItems="center"
+    justifyContent="center"
+    px={4}
+    py={8}
+  >
     <SaleForm
-      title="Add sale"
-      submitLabel="Create sale"
+      title="Create Sale"
+      submitLabel="Complete Sale"
       isSaving={isSaving}
       vehicles={vehicles}
       clients={clients}
       onBack={() => navigate("/sales")}
       onSubmit={handleSubmit}
     />
-  );
+  </Box>
+);
 }

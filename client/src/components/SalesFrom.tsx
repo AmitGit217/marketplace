@@ -8,9 +8,10 @@ import {
   Input,
   NativeSelect,
   Separator,
+  Text,
 } from "@chakra-ui/react";
 import { useState } from "react";
-import { LuArrowLeft, LuSave } from "react-icons/lu";
+import { LuArrowLeft, LuSave, LuCar } from "react-icons/lu";
 
 export interface SaleFormData {
   vehicleId: string;
@@ -18,6 +19,17 @@ export interface SaleFormData {
   saleDate: string;
   paymentMethod: string;
   deliveryDate: string;
+}
+
+export interface VehicleOption {
+  id: string | number;
+  brand: string;
+  model: string;
+  year?: number;
+  price?: number;
+  mileage?: number;
+  fuelType?: string;
+  transmission?: string;
 }
 
 interface SelectOption {
@@ -31,7 +43,7 @@ interface SaleFormProps {
   isSaving: boolean;
   initialValues?: Partial<SaleFormData>;
 
-  vehicles: SelectOption[];
+  vehicles: VehicleOption[];
   clients: SelectOption[];
 
   onBack: () => void;
@@ -48,24 +60,31 @@ export default function SaleForm({
   onBack,
   onSubmit,
 }: SaleFormProps) {
-  const [vehicleId, setVehicleId] =
-    useState(initialValues?.vehicleId ?? "");
+  const [vehicleId, setVehicleId] = useState(
+    initialValues?.vehicleId ?? "",
+  );
 
-  const [clientId, setClientId] =
-    useState(initialValues?.clientId ?? "");
+  const [clientId, setClientId] = useState(
+    initialValues?.clientId ?? "",
+  );
 
-  const [saleDate, setSaleDate] =
-    useState(initialValues?.saleDate ?? "");
+  const [saleDate, setSaleDate] = useState(
+    initialValues?.saleDate ?? "",
+  );
 
-  const [paymentMethod, setPaymentMethod] =
-    useState(initialValues?.paymentMethod ?? "");
+  const [paymentMethod, setPaymentMethod] = useState(
+    initialValues?.paymentMethod ?? "",
+  );
 
-  const [deliveryDate, setDeliveryDate] =
-    useState(initialValues?.deliveryDate ?? "");
+  const [deliveryDate, setDeliveryDate] = useState(
+    initialValues?.deliveryDate ?? "",
+  );
 
-  const handleSubmit = async (
-    event: React.FormEvent,
-  ) => {
+  const selectedVehicle = vehicles.find(
+    (vehicle) => String(vehicle.id) === vehicleId,
+  );
+
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     await onSubmit({
@@ -77,8 +96,28 @@ export default function SaleForm({
     });
   };
 
+  const formatPrice = (price?: number) => {
+    if (price === undefined || price === null) {
+      return null;
+    }
+
+    return new Intl.NumberFormat("es-ES", {
+      style: "currency",
+      currency: "EUR",
+      maximumFractionDigits: 0,
+    }).format(price);
+  };
+
+  const formatMileage = (mileage?: number) => {
+    if (mileage === undefined || mileage === null) {
+      return null;
+    }
+
+    return `${new Intl.NumberFormat("es-ES").format(mileage)} km`;
+  };
+
   return (
-    <Box maxW="800px" mx="auto">
+    <Box maxW="850px" mx="auto">
       <Flex align="center" mb={6}>
         <Button
           variant="ghost"
@@ -90,14 +129,15 @@ export default function SaleForm({
         </Button>
       </Flex>
 
-      <Heading size="lg" mb={6}>
+      <Heading size="lg" mb={2}>
         {title}
       </Heading>
 
-      <Card.Root
-        borderRadius="2xl"
-        shadow="sm"
-      >
+      <Text color="fg.muted" mb={6}>
+        Select the vehicle and client, then complete the sale details.
+      </Text>
+
+      <Card.Root borderRadius="2xl" shadow="sm">
         <Card.Body p={{ base: 5, md: 8 }}>
           <form onSubmit={handleSubmit}>
             <Flex direction="column" gap={5}>
@@ -124,12 +164,102 @@ export default function SaleForm({
                         key={vehicle.id}
                         value={vehicle.id}
                       >
-                        {vehicle.label}
+                        {vehicle.brand} {vehicle.model}
+                        {vehicle.year
+                          ? ` · ${vehicle.year}`
+                          : ""}
+                        {vehicle.price !== undefined
+                          ? ` · ${formatPrice(vehicle.price)}`
+                          : ""}
                       </option>
                     ))}
                   </NativeSelect.Field>
                 </NativeSelect.Root>
               </Field.Root>
+
+              {/* Selected vehicle summary */}
+
+              {selectedVehicle && (
+                <Card.Root
+                  variant="outline"
+                  borderRadius="xl"
+                  bg="bg.subtle"
+                >
+                  <Card.Body p={5}>
+                    <Flex
+                      justify="space-between"
+                      align={{ base: "flex-start", md: "center" }}
+                      gap={4}
+                      direction={{ base: "column", md: "row" }}
+                    >
+                      <Flex gap={4} align="center">
+                        <Flex
+                          w="44px"
+                          h="44px"
+                          align="center"
+                          justify="center"
+                          borderRadius="lg"
+                          bg="bg.muted"
+                        >
+                          <LuCar />
+                        </Flex>
+
+                        <Box>
+                          <Text
+                            fontWeight="semibold"
+                            fontSize="lg"
+                          >
+                            {selectedVehicle.brand}{" "}
+                            {selectedVehicle.model}{" "}
+                            
+                            
+                          </Text>
+
+                          <Text
+                            fontSize="sm"
+                            color="fg.muted"
+                          >
+                            {[
+                              selectedVehicle.year,
+                              formatMileage(
+                                selectedVehicle.mileage,
+                              ),
+                              selectedVehicle.fuelType,
+                              selectedVehicle.transmission,
+                            ]
+                              .filter(Boolean)
+                              .join(" · ")}
+                          </Text>
+                        </Box>
+                      </Flex>
+
+                      {selectedVehicle.price !== undefined && (
+                        <Box textAlign={{ base: "left", md: "right" }}>
+                          <Text
+                            fontSize="xs"
+                            color="fg.muted"
+                          >
+                            Sale price
+                          </Text>
+
+                          <Text
+                            fontSize="xl"
+                            fontWeight="bold"
+                          >
+                            {formatPrice(
+                              selectedVehicle.price,
+                            )}
+                          </Text>
+                        </Box>
+                      )}
+
+                     
+                    </Flex>
+                  </Card.Body>
+                </Card.Root>
+              )}
+
+              <Separator />
 
               {/* Client */}
 
@@ -190,9 +320,7 @@ export default function SaleForm({
                   <NativeSelect.Field
                     value={paymentMethod}
                     onChange={(e) =>
-                      setPaymentMethod(
-                        e.target.value,
-                      )
+                      setPaymentMethod(e.target.value)
                     }
                   >
                     <option value="">
@@ -229,9 +357,7 @@ export default function SaleForm({
                   type="date"
                   value={deliveryDate}
                   onChange={(e) =>
-                    setDeliveryDate(
-                      e.target.value,
-                    )
+                    setDeliveryDate(e.target.value)
                   }
                 />
               </Field.Root>
