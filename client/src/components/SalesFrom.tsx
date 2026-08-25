@@ -170,7 +170,8 @@ export default function SaleForm({
                           : ""}
                         {vehicle.price !== undefined
                           ? ` · ${formatPrice(vehicle.price)}`
-                          : ""}
+                          : ""} {" · "}
+                          {vehicle.id}
                       </option>
                     ))}
                   </NativeSelect.Field>
@@ -205,32 +206,37 @@ export default function SaleForm({
                         </Flex>
 
                         <Box>
-                          <Text
-                            fontWeight="semibold"
-                            fontSize="lg"
-                          >
-                            {selectedVehicle.brand}{" "}
-                            {selectedVehicle.model}{" "}
-                            
-                            
-                          </Text>
+  <Text
+    fontWeight="semibold"
+    fontSize="lg"
+  >
+    {selectedVehicle.brand}{" "}
+    {selectedVehicle.model}
+  </Text>
 
-                          <Text
-                            fontSize="sm"
-                            color="fg.muted"
-                          >
-                            {[
-                              selectedVehicle.year,
-                              formatMileage(
-                                selectedVehicle.mileage,
-                              ),
-                              selectedVehicle.fuelType,
-                              selectedVehicle.transmission,
-                            ]
-                              .filter(Boolean)
-                              .join(" · ")}
-                          </Text>
-                        </Box>
+  <Text
+    fontSize="xs"
+    color="fg.muted"
+    mt={1}
+  >
+    Vehicle ID: {selectedVehicle.id}
+  </Text>
+
+  <Text
+    fontSize="sm"
+    color="fg.muted"
+    mt={1}
+  >
+    {[
+      selectedVehicle.year,
+      formatMileage(selectedVehicle.mileage),
+      selectedVehicle.fuelType,
+      selectedVehicle.transmission,
+    ]
+      .filter(Boolean)
+      .join(" · ")}
+  </Text>
+</Box>
                       </Flex>
 
                       {selectedVehicle.price !== undefined && (
