@@ -5,18 +5,24 @@ import ScrollToTopButton from "./components/ui/ScrollToTopButton";
 
 import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
+
+import Vehicles from "./pages/vehicle/Vehicles";
 import VehicleDetails from "./pages/VehicleDetails";
-import Vehicles from "./pages/Vehicles";
+import VehicleCreate from "./pages/vehicle/VehicleCreate";
+import VehicleEdit from "./pages/vehicle/VechicleEdit";
+
 import Sales from "./pages/sales/Sales";
 import SaleDetails from "./pages/sales/SaleDetails";
-import Clients from "./pages/clients/Clients";
-import ClientDetails from "./pages/clients/ClientDetails";
-import Personnel from "./pages/personnel/Personnel";
-import PersonnelDetails from "./components/PersonnelDetails";
-import ClientEdit from "./pages/clients/ClientEdit";
-import ClientCreate from "./pages/clients/CreateClient";
 import SaleCreate from "./pages/sales/SaleCreate";
 import SaleEdit from "./pages/sales/SaleEdit";
+
+import Clients from "./pages/clients/Clients";
+import ClientDetails from "./pages/clients/ClientDetails";
+import ClientCreate from "./pages/clients/CreateClient";
+import ClientEdit from "./pages/clients/ClientEdit";
+
+import Personnel from "./pages/personnel/Personnel";
+import PersonnelDetails from "./components/PersonnelDetails";
 import PersonnelCreate from "./pages/personnel/PersonnelCreate";
 import PersonnelEdit from "./pages/personnel/PersonnelEdit";
 
@@ -27,78 +33,112 @@ function App() {
 
       <Routes>
         {/* Public */}
-        <Route path="/" element={<Auth />} />
+        <Route
+          path="/"
+          element={<Auth />}
+        />
 
         {/* Main */}
-        <Route path="/dashboard" element={<Dashboard />} />
-
-        {/* Management */}
-        <Route path="/vehicles" element={<Vehicles />} />
-        <Route path="/sales" element={<Sales />} />
         <Route
-  path="/clients"
-  element={<Clients />}
-/>
+          path="/dashboard"
+          element={<Dashboard />}
+        />
 
+        {/* =========================
+            Vehicles
+        ========================= */}
 
-
-<Route
-  path="/personnel"
-  element={<Personnel />}
-/>
-
-
-
-
-        {/* Details */}
         <Route
-        path="/vehicles/:id"
-        element={<VehicleDetails />}
-      />
-      <Route path="/sales/:id" element={<SaleDetails />} />
-      <Route
-  path="/clients/:id"
-  element={<ClientDetails />}
-/>
+          path="/vehicles"
+          element={<Vehicles />}
+        />
 
-<Route
-  path="/personnel/:id"
-  element={<PersonnelDetails />}
-/>
+        <Route
+          path="/vehicles/new"
+          element={<VehicleCreate />}
+        />
 
-<Route
-  path="/clients/:id/edit"
-  element={<ClientEdit />}
-/>
+        <Route
+          path="/vehicles/:id"
+          element={<VehicleDetails />}
+        />
 
-<Route
-  path="/clients/new"
-  element={<ClientCreate />}
-/>
-<Route
-  path="/sales/new"
-  element={<SaleCreate />}
-/>
+        <Route
+          path="/vehicles/:id/edit"
+          element={<VehicleEdit />}
+        />
 
-<Route
-  path="/sales/:id/edit"
-  element={<SaleEdit />}
-/>
+        {/* =========================
+            Sales
+        ========================= */}
 
-<Route
-  path="/personnel"
-  element={<Personnel />}
-/>
+        <Route
+          path="/sales"
+          element={<Sales />}
+        />
 
-<Route
-  path="/personnel/create"
-  element={<PersonnelCreate />}
-/>
+        <Route
+          path="/sales/new"
+          element={<SaleCreate />}
+        />
 
-<Route
-  path="/personnel/:id/edit"
-  element={<PersonnelEdit />}
-/>
+        <Route
+          path="/sales/:id"
+          element={<SaleDetails />}
+        />
+
+        <Route
+          path="/sales/:id/edit"
+          element={<SaleEdit />}
+        />
+
+        {/* =========================
+            Clients
+        ========================= */}
+
+        <Route
+          path="/clients"
+          element={<Clients />}
+        />
+
+        <Route
+          path="/clients/new"
+          element={<ClientCreate />}
+        />
+
+        <Route
+          path="/clients/:id"
+          element={<ClientDetails />}
+        />
+
+        <Route
+          path="/clients/:id/edit"
+          element={<ClientEdit />}
+        />
+
+        {/* =========================
+            Personnel
+        ========================= */}
+
+        <Route
+          path="/personnel"
+          element={<Personnel />}
+        />
+
+        <Route
+          path="/personnel/create"
+          element={<PersonnelCreate />}
+        />
+
+        <Route
+          path="/personnel/:id"
+          element={<PersonnelDetails />}
+        />
+
+        <Route
+          path="/personnel/:id/edit"
+          element={<PersonnelEdit />}
+        />
       </Routes>
 
       <ScrollToTopButton />

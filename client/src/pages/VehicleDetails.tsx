@@ -28,14 +28,10 @@ import {
 import type { Vehicle } from "@/types/vehicle";
 import { vehiclesApi } from "@/api/vehicles";
 import { ColorSpecification } from "@/utils/ColorSpecification";
-import VehicleEditForm from "@/components/VehicleEditForm";
-
-
 
 export default function VehicleDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
-  const [isEditing, setIsEditing] = useState(false);
 
   const [vehicle, setVehicle] =
     useState<Vehicle | null>(null);
@@ -52,6 +48,11 @@ export default function VehicleDetails() {
           await vehiclesApi.getById(id);
 
         setVehicle(data);
+      } catch (error) {
+        console.error(
+          "Failed to load vehicle:",
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -101,317 +102,301 @@ export default function VehicleDetails() {
     );
   }
 
- return (
-  <Box maxW="1400px" mx="auto">
-    {/* Back + Edit */}
-    <Flex
-      justify="space-between"
-      align="center"
-      mb={6}
-    >
-      <Button
-        variant="ghost"
-        size="sm"
-        onClick={() => navigate("/vehicles")}
+  return (
+    <Box maxW="1400px" mx="auto">
+      {/* Back + Edit */}
+      <Flex
+        justify="space-between"
+        align="center"
+        mb={6}
       >
-        <LuArrowLeft />
-        Back to vehicles
-      </Button>
+        <Button
+          variant="ghost"
+          size="sm"
+          onClick={() =>
+            navigate("/vehicles")
+          }
+        >
+          <LuArrowLeft />
+          Back to vehicles
+        </Button>
 
-      {!isEditing && (
         <Button
           colorPalette="brand"
-          onClick={() => setIsEditing(true)}
+          onClick={() =>
+            navigate(
+              `/vehicles/${vehicle.id}/edit`
+            )
+          }
         >
           <LuPencil />
           Edit vehicle
         </Button>
-      )}
-    </Flex>
+      </Flex>
 
-    {/* Content */}
-    {isEditing ? (
-      <VehicleEditForm
-        vehicle={vehicle}
-        onCancel={() => setIsEditing(false)}
-        onSaved={(updatedVehicle) => {
-          setVehicle(updatedVehicle);
-          setIsEditing(false);
-        }}
-      />
-    ) : (
-      <>
-        {/* Main vehicle card */}
-        <Card.Root
-          overflow="hidden"
-          borderRadius="2xl"
-          shadow="sm"
+      {/* Main vehicle card */}
+      <Card.Root
+        overflow="hidden"
+        borderRadius="2xl"
+        shadow="sm"
+      >
+        <Grid
+          templateColumns={{
+            base: "1fr",
+            lg: "1.1fr 1fr",
+          }}
         >
-          <Grid
-            templateColumns={{
-              base: "1fr",
-              lg: "1.1fr 1fr",
+          {/* IMAGE */}
+          <Box
+            position="relative"
+            bg="gray.100"
+            _dark={{
+              bg: "gray.800",
+            }}
+            minH={{
+              base: "280px",
+              md: "400px",
+              lg: "500px",
             }}
           >
-            {/* IMAGE */}
-            <Box
-              position="relative"
-              bg="gray.100"
-              _dark={{
-                bg: "gray.800",
-              }}
+            <Image
+              src={vehicle.image}
+              alt={`${vehicle.brand} ${vehicle.model}`}
+              w="100%"
+              h="100%"
               minH={{
                 base: "280px",
                 md: "400px",
                 lg: "500px",
               }}
+              objectFit="cover"
+            />
+
+            <Box
+              position="absolute"
+              top={4}
+              right={4}
             >
-              <Image
-                src={vehicle.image}
-                alt={`${vehicle.brand} ${vehicle.model}`}
-                w="100%"
-                h="100%"
-                minH={{
-                  base: "280px",
-                  md: "400px",
-                  lg: "500px",
-                }}
-                objectFit="cover"
-              />
-
-              {/* Status */}
-              <Box
-                position="absolute"
-                top={4}
-                right={4}
+              <Badge
+                size="lg"
+                variant="solid"
+                colorPalette={
+                  vehicle.status === "available"
+                    ? "green"
+                    : "gray"
+                }
               >
-                <Badge
-                  size="lg"
-                  variant="solid"
-                  colorPalette={
-                    vehicle.status === "available"
-                      ? "green"
-                      : "gray"
-                  }
-                >
-                  {vehicle.status}
-                </Badge>
-              </Box>
+                {vehicle.status}
+              </Badge>
             </Box>
+          </Box>
 
-            {/* INFORMATION */}
-            <Box p={{ base: 5, md: 8 }}>
-              <Flex
-                direction="column"
-                h="100%"
-              >
-                {/* Header */}
-                <Box>
-                  <Text
-                    fontSize="sm"
-                    color="fg.muted"
-                    fontWeight="600"
-                    textTransform="uppercase"
-                    letterSpacing="wide"
-                    mb={1}
-                  >
-                    {vehicle.type}
-                  </Text>
+          {/* INFORMATION */}
+          <Box p={{ base: 5, md: 8 }}>
+            <Flex
+              direction="column"
+              h="100%"
+            >
+              <Box>
+                <Text
+                  fontSize="sm"
+                  color="fg.muted"
+                  fontWeight="600"
+                  textTransform="uppercase"
+                  letterSpacing="wide"
+                  mb={1}
+                >
+                  {vehicle.type}
+                </Text>
 
-                  <Heading
-                    size={{
-                      base: "xl",
-                      md: "2xl",
-                    }}
-                  >
-                    {vehicle.brand}{" "}
-                    {vehicle.model}
-                  </Heading>
-
-                  <Text
-                    mt={2}
-                    color="fg.muted"
-                  >
-                    {vehicle.manufactureYear} ·{" "}
-                    {vehicle.color}
-                  </Text>
-                </Box>
-
-                <Separator my={6} />
-
-                {/* Price */}
-                <Box>
-                  <Text
-                    fontSize="sm"
-                    color="fg.muted"
-                    mb={1}
-                  >
-                    Price
-                  </Text>
-
-                  <Text
-                    fontSize={{
-                      base: "3xl",
-                      md: "4xl",
-                    }}
-                    fontWeight="700"
-                    color="colorPalette.500"
-                  >
-                    €
-                    {Number(
-                      vehicle.price
-                    ).toLocaleString()}
-                  </Text>
-                </Box>
-
-                <Separator my={6} />
-
-                {/* Specifications */}
-                <SimpleGrid
-                  columns={{
-                    base: 1,
-                    sm: 2,
+                <Heading
+                  size={{
+                    base: "xl",
+                    md: "2xl",
                   }}
-                  gap={5}
                 >
-                  <Specification
-                    icon={<LuCar />}
-                    label="Type"
-                    value={vehicle.type}
-                  />
+                  {vehicle.brand}{" "}
+                  {vehicle.model}
+                </Heading>
 
-                  <Specification
-                    icon={<LuCalendar />}
-                    label="Year"
-                    value={String(
-                      vehicle.manufactureYear
-                    )}
-                  />
+                <Text
+                  mt={2}
+                  color="fg.muted"
+                >
+                  {vehicle.manufactureYear} ·{" "}
+                  {vehicle.color}
+                </Text>
+              </Box>
 
-                  <Specification
-                    icon={<LuCircleGauge />}
-                    label="Mileage"
-                    value={`${vehicle.mileage.toLocaleString()} km`}
-                  />
+              <Separator my={6} />
 
-                  <Specification
-                    icon={<LuWrench />}
-                    label="Condition"
-                    value={vehicle.condition}
-                  />
+              {/* Price */}
+              <Box>
+                <Text
+                  fontSize="sm"
+                  color="fg.muted"
+                  mb={1}
+                >
+                  Price
+                </Text>
 
-                  <ColorSpecification
-                    color={vehicle.color}
-                  />
+                <Text
+                  fontSize={{
+                    base: "3xl",
+                    md: "4xl",
+                  }}
+                  fontWeight="700"
+                  color="colorPalette.500"
+                >
+                  €
+                  {Number(
+                    vehicle.price
+                  ).toLocaleString()}
+                </Text>
+              </Box>
 
-                  <Specification
-                    icon={<LuTag />}
-                    label="Status"
-                    value={vehicle.status}
-                  />
-                </SimpleGrid>
+              <Separator my={6} />
 
-                <Box mt="auto" pt={8}>
-                  <Text
-                    fontSize="xs"
-                    color="fg.muted"
-                  >
-                    Acquired on{" "}
-                    {new Date(
-                      vehicle.acquisitionDate
-                    ).toLocaleDateString()}
-                  </Text>
-                </Box>
-              </Flex>
-            </Box>
-          </Grid>
-        </Card.Root>
+              {/* Specifications */}
+              <SimpleGrid
+                columns={{
+                  base: 1,
+                  sm: 2,
+                }}
+                gap={5}
+              >
+                <Specification
+                  icon={<LuCar />}
+                  label="Type"
+                  value={vehicle.type}
+                />
 
-        {/* Additional information */}
-        <Card.Root
-          mt={6}
-          borderRadius="2xl"
-          shadow="sm"
+                <Specification
+                  icon={<LuCalendar />}
+                  label="Year"
+                  value={String(
+                    vehicle.manufactureYear
+                  )}
+                />
+
+                <Specification
+                  icon={<LuCircleGauge />}
+                  label="Mileage"
+                  value={`${vehicle.mileage.toLocaleString()} km`}
+                />
+
+                <Specification
+                  icon={<LuWrench />}
+                  label="Condition"
+                  value={vehicle.condition}
+                />
+
+                <ColorSpecification
+                  color={vehicle.color}
+                />
+
+                <Specification
+                  icon={<LuTag />}
+                  label="Status"
+                  value={vehicle.status}
+                />
+              </SimpleGrid>
+
+              <Box mt="auto" pt={8}>
+                <Text
+                  fontSize="xs"
+                  color="fg.muted"
+                >
+                  Acquired on{" "}
+                  {new Date(
+                    vehicle.acquisitionDate
+                  ).toLocaleDateString()}
+                </Text>
+              </Box>
+            </Flex>
+          </Box>
+        </Grid>
+      </Card.Root>
+
+      {/* Additional information */}
+      <Card.Root
+        mt={6}
+        borderRadius="2xl"
+        shadow="sm"
+      >
+        <Card.Body
+          p={{ base: 5, md: 8 }}
         >
-          <Card.Body
-            p={{ base: 5, md: 8 }}
+          <Heading size="md" mb={5}>
+            Vehicle information
+          </Heading>
+
+          <SimpleGrid
+            columns={{
+              base: 1,
+              md: 2,
+            }}
+            gap={6}
           >
-            <Heading size="md" mb={5}>
-              Vehicle information
-            </Heading>
+            <InfoRow
+              label="Vehicle ID"
+              value={String(vehicle.id)}
+            />
 
-            <SimpleGrid
-              columns={{
-                base: 1,
-                md: 2,
-              }}
-              gap={6}
-            >
-              <InfoRow
-                label="Vehicle ID"
-                value={vehicle.id}
-              />
+            <InfoRow
+              label="Brand"
+              value={vehicle.brand}
+            />
 
-              <InfoRow
-                label="Brand"
-                value={vehicle.brand}
-              />
+            <InfoRow
+              label="Model"
+              value={vehicle.model}
+            />
 
-              <InfoRow
-                label="Model"
-                value={vehicle.model}
-              />
+            <InfoRow
+              label="Type"
+              value={vehicle.type}
+            />
 
-              <InfoRow
-                label="Type"
-                value={vehicle.type}
-              />
+            <InfoRow
+              label="Manufacture year"
+              value={String(
+                vehicle.manufactureYear
+              )}
+            />
 
-              <InfoRow
-                label="Manufacture year"
-                value={String(
-                  vehicle.manufactureYear
-                )}
-              />
+            <InfoRow
+              label="Mileage"
+              value={`${vehicle.mileage.toLocaleString()} km`}
+            />
 
-              <InfoRow
-                label="Mileage"
-                value={`${vehicle.mileage.toLocaleString()} km`}
-              />
+            <InfoRow
+              label="Condition"
+              value={vehicle.condition}
+            />
 
-              <InfoRow
-                label="Condition"
-                value={vehicle.condition}
-              />
+            <InfoRow
+              label="Color"
+              value={vehicle.color}
+            />
 
-              <InfoRow
-                label="Color"
-                value={vehicle.color}
-              />
+            <InfoRow
+              label="Acquisition date"
+              value={new Date(
+                vehicle.acquisitionDate
+              ).toLocaleDateString()}
+            />
 
-              <InfoRow
-                label="Acquisition date"
-                value={new Date(
-                  vehicle.acquisitionDate
-                ).toLocaleDateString()}
-              />
-
-              <InfoRow
-                label="Status"
-                value={vehicle.status}
-              />
-            </SimpleGrid>
-          </Card.Body>
-        </Card.Root>
-      </>
-    )}
-  </Box>
-);
+            <InfoRow
+              label="Status"
+              value={vehicle.status}
+            />
+          </SimpleGrid>
+        </Card.Body>
+      </Card.Root>
+    </Box>
+  );
 }
-
-/* =========================
-   Specification
-========================= */
 
 interface SpecificationProps {
   icon: React.ReactNode;
@@ -458,10 +443,6 @@ function Specification({
     </HStack>
   );
 }
-
-/* =========================
-   Info Row
-========================= */
 
 interface InfoRowProps {
   label: string;

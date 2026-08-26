@@ -12,14 +12,16 @@ import {
 import { useEffect, useState } from "react";
 
 import type {
+  CreateVehicleDto,
   UpdateVehicleDto,
   Vehicle,
 } from "@/types/vehicle";
 
 import { vehiclesApi } from "@/api/vehicles";
 
-interface VehicleEditFormProps {
-  vehicle: Vehicle;
+interface VehicleFormProps {
+  mode: "create" | "edit";
+  vehicle?: Vehicle;
   onCancel: () => void;
   onSaved: (vehicle: Vehicle) => void;
 }
@@ -38,27 +40,48 @@ interface FormState {
   color: string;
 }
 
-export default function VehicleEditForm({
+const emptyForm: FormState = {
+  brand: "",
+  model: "",
+  type: "",
+  manufactureYear: "",
+  mileage: "",
+  condition: "",
+  price: "",
+  acquisitionDate: "",
+  status: "available",
+  image: "",
+  color: "",
+};
+
+const getFormFromVehicle = (
+  vehicle: Vehicle
+): FormState => ({
+  brand: vehicle.brand,
+  model: vehicle.model,
+  type: vehicle.type,
+  manufactureYear: String(vehicle.manufactureYear),
+  mileage: String(vehicle.mileage),
+  condition: vehicle.condition,
+  price: String(vehicle.price),
+  acquisitionDate:
+    vehicle.acquisitionDate.slice(0, 10),
+  status: vehicle.status,
+  image: vehicle.image,
+  color: vehicle.color,
+});
+
+export default function VehicleForm({
+  mode,
   vehicle,
   onCancel,
   onSaved,
-}: VehicleEditFormProps) {
-  const [form, setForm] =
-    useState<FormState>({
-      brand: vehicle.brand,
-      model: vehicle.model,
-      type: vehicle.type,
-      manufactureYear:
-        String(vehicle.manufactureYear),
-      mileage: String(vehicle.mileage),
-      condition: vehicle.condition,
-      price: String(vehicle.price),
-      acquisitionDate:
-        vehicle.acquisitionDate.slice(0, 10),
-      status: vehicle.status,
-      image: vehicle.image,
-      color: vehicle.color,
-    });
+}: VehicleFormProps) {
+  const [form, setForm] = useState<FormState>(
+    mode === "edit" && vehicle
+      ? getFormFromVehicle(vehicle)
+      : emptyForm
+  );
 
   const [isSaving, setIsSaving] =
     useState(false);
@@ -67,22 +90,12 @@ export default function VehicleEditForm({
     useState<string | null>(null);
 
   useEffect(() => {
-    setForm({
-      brand: vehicle.brand,
-      model: vehicle.model,
-      type: vehicle.type,
-      manufactureYear:
-        String(vehicle.manufactureYear),
-      mileage: String(vehicle.mileage),
-      condition: vehicle.condition,
-      price: String(vehicle.price),
-      acquisitionDate:
-        vehicle.acquisitionDate.slice(0, 10),
-      status: vehicle.status,
-      image: vehicle.image,
-      color: vehicle.color,
-    });
-  }, [vehicle]);
+    if (mode === "edit" && vehicle) {
+      setForm(getFormFromVehicle(vehicle));
+    } else {
+      setForm(emptyForm);
+    }
+  }, [mode, vehicle]);
 
   const handleChange = (
     field: keyof FormState,
@@ -103,40 +116,82 @@ export default function VehicleEditForm({
     setIsSaving(true);
 
     try {
-      const data: UpdateVehicleDto = {
-        brand: form.brand,
-        model: form.model,
-        type: form.type,
-        manufactureYear:
-          Number(form.manufactureYear),
-        mileage: Number(form.mileage),
-        condition: form.condition,
-        price: form.price,
-        acquisitionDate:
-          new Date(
-            form.acquisitionDate
-          ).toISOString(),
-        status: form.status,
-        image: form.image,
-        color: form.color,
-      };
-
-      const updated =
-        await vehiclesApi.update(
-          vehicle.id,
-          data
+      if (!form.acquisitionDate) {
+        throw new Error(
+          "Acquisition date is required."
         );
+      }
 
-      onSaved(updated);
+      if (mode === "create") {
+        const data: CreateVehicleDto = {
+          brand: form.brand,
+          model: form.model,
+          type: form.type,
+          manufactureYear:
+            Number(form.manufactureYear),
+          mileage: Number(form.mileage),
+          condition: form.condition,
+          price: form.price,
+          acquisitionDate:
+            new Date(
+              form.acquisitionDate
+            ).toISOString(),
+          status: form.status,
+          image: form.image,
+          color: form.color,
+        };
+
+        const created =
+          await vehiclesApi.create(data);
+
+        onSaved(created);
+      } else {
+        if (!vehicle) {
+          throw new Error(
+            "Vehicle is required for editing."
+          );
+        }
+
+        const data: UpdateVehicleDto = {
+          brand: form.brand,
+          model: form.model,
+          type: form.type,
+          manufactureYear:
+            Number(form.manufactureYear),
+          mileage: Number(form.mileage),
+          condition: form.condition,
+          price: form.price,
+          acquisitionDate:
+            new Date(
+              form.acquisitionDate
+            ).toISOString(),
+          status: form.status,
+          image: form.image,
+          color: form.color,
+        };
+
+        const updated =
+          await vehiclesApi.update(
+            vehicle.id,
+            data
+          );
+
+        onSaved(updated);
+      }
     } catch (err) {
       console.error(err);
+
       setError(
-        "Could not update the vehicle."
+        mode === "create"
+          ? "Could not create the vehicle."
+          : "Could not update the vehicle."
       );
     } finally {
       setIsSaving(false);
     }
   };
+
+  const isEdit = mode === "edit";
 
   return (
     <Card.Root
@@ -145,7 +200,9 @@ export default function VehicleEditForm({
     >
       <Card.Body p={{ base: 5, md: 8 }}>
         <Heading size="md" mb={6}>
-          Edit vehicle
+          {isEdit
+            ? "Edit vehicle"
+            : "Create vehicle"}
         </Heading>
 
         <Box
@@ -159,7 +216,7 @@ export default function VehicleEditForm({
             }}
             gap={5}
           >
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Brand
               </Field.Label>
@@ -175,7 +232,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Model
               </Field.Label>
@@ -191,7 +248,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Type
               </Field.Label>
@@ -207,7 +264,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Manufacture year
               </Field.Label>
@@ -226,7 +283,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Mileage
               </Field.Label>
@@ -243,7 +300,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Price
               </Field.Label>
@@ -261,7 +318,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Condition
               </Field.Label>
@@ -277,7 +334,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Color
               </Field.Label>
@@ -293,7 +350,7 @@ export default function VehicleEditForm({
               />
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Status
               </Field.Label>
@@ -312,18 +369,18 @@ export default function VehicleEditForm({
                     Available
                   </option>
 
-                  <option value="sold">
-                    Sold
-                  </option>
-
                   <option value="reserved">
                     Reserved
+                  </option>
+
+                  <option value="sold">
+                    Sold
                   </option>
                 </NativeSelect.Field>
               </NativeSelect.Root>
             </Field.Root>
 
-            <Field.Root>
+            <Field.Root required>
               <Field.Label>
                 Acquisition date
               </Field.Label>
@@ -360,6 +417,7 @@ export default function VehicleEditForm({
                     e.target.value
                   )
                 }
+                placeholder="https://..."
               />
             </Field.Root>
           </Grid>
@@ -395,7 +453,9 @@ export default function VehicleEditForm({
               colorPalette="brand"
               loading={isSaving}
             >
-              Save changes
+              {isEdit
+                ? "Save changes"
+                : "Create vehicle"}
             </Button>
           </Flex>
         </Box>

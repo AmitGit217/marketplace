@@ -1,10 +1,15 @@
 import { useEffect, useState } from "react";
+import { Button, Flex } from "@chakra-ui/react";
+import { LuPlus } from "react-icons/lu";
+import { useNavigate } from "react-router-dom";
 
 import type { Vehicle } from "@/types/vehicle";
 
 import { vehiclesApi } from "@/api/vehicles";
-import { ManagementTable, type TableColumn } from "@/components/management/ManagementTable";
-import { useNavigate } from "react-router-dom";
+import {
+  ManagementTable,
+  type TableColumn,
+} from "@/components/management/ManagementTable";
 
 const vehicleColumns: TableColumn<Vehicle>[] = [
   {
@@ -52,6 +57,11 @@ export default function Vehicles() {
       try {
         const data = await vehiclesApi.getAll();
         setVehicles(data);
+      } catch (error) {
+        console.error(
+          "Failed to load vehicles:",
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -61,13 +71,26 @@ export default function Vehicles() {
   }, []);
 
   return (
-    <ManagementTable
-      data={vehicles}
-      columns={vehicleColumns}
-      isLoading={isLoading}
-      onRowClick={(vehicle) =>
-        navigate(`/vehicles/${vehicle.id}`)
-      }
-    />
+    <Flex direction="column" gap={4}>
+      <Flex justify="flex-end">
+        <Button
+          onClick={() =>
+            navigate("/vehicles/new")
+          }
+        >
+          <LuPlus />
+          Create Vehicle
+        </Button>
+      </Flex>
+
+      <ManagementTable
+        data={vehicles}
+        columns={vehicleColumns}
+        isLoading={isLoading}
+        onRowClick={(vehicle) =>
+          navigate(`/vehicles/${vehicle.id}`)
+        }
+      />
+    </Flex>
   );
 }
