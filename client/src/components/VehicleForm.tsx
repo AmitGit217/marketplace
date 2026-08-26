@@ -49,7 +49,7 @@ const emptyForm: FormState = {
   condition: "",
   price: "",
   acquisitionDate: "",
-  status: "available",
+  status: "Available",
   image: "",
   color: "",
 };
@@ -365,15 +365,15 @@ export default function VehicleForm({
                     )
                   }
                 >
-                  <option value="available">
+                  <option value="Available">
                     Available
                   </option>
 
-                  <option value="reserved">
+                  <option value="Reserved">
                     Reserved
                   </option>
 
-                  <option value="sold">
+                  <option value="Sold">
                     Sold
                   </option>
                 </NativeSelect.Field>
