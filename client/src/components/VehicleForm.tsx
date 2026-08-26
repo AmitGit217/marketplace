@@ -8,6 +8,7 @@ import {
   Heading,
   Input,
   NativeSelect,
+  Text,
 } from "@chakra-ui/react";
 import { useEffect, useState } from "react";
 
@@ -334,22 +335,67 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
-              <Field.Label>
-                Color
-              </Field.Label>
+<Field.Root required>
+  <Field.Label>Color</Field.Label>
 
-              <Input
-                value={form.color}
-                onChange={(e) =>
-                  handleChange(
-                    "color",
-                    e.target.value
-                  )
-                }
-              />
-            </Field.Root>
+  <Flex wrap="wrap" gap={3}>
+    {[
+      { name: "Black", value: "rgb(0, 0, 0)" },
+{ name: "White", value: "rgb(255, 255, 255)" },
+{ name: "Gray", value: "rgb(107, 114, 128)" },
+{ name: "Silver", value: "rgb(192, 192, 192)" },
+{ name: "Red", value: "rgb(220, 38, 38)" },
+{ name: "Blue", value: "rgb(37, 99, 235)" },
+{ name: "Navy", value: "rgb(30, 58, 138)" },
+{ name: "Green", value: "rgb(22, 163, 74)" },
+{ name: "Yellow", value: "rgb(234, 179, 8)" },
+{ name: "Orange", value: "rgb(234, 88, 12)" },
+{ name: "Brown", value: "rgb(146, 64, 14)" },
+{ name: "Beige", value: "rgb(214, 198, 165)" },
+    ].map((color) => (
+      <Box key={color.value}>
+        <Button
+          type="button"
+          aria-label={color.name}
+          title={color.name}
+          w="40px"
+          h="40px"
+          minW="40px"
+          p={0}
+          borderRadius="full"
+          bg={color.value}
+          borderWidth="2px"
+          borderColor={
+            form.color === color.value
+              ? "colorPalette.500"
+              : "border"
+          }
+          boxShadow={
+            form.color === color.value
+              ? "0 0 0 2px var(--chakra-colors-color-palette-500)"
+              : "none"
+          }
+          onClick={() =>
+            handleChange(
+              "color",
+              color.value
+            )
+          }
+        />
+      </Box>
+    ))}
+  </Flex>
 
+  {form.color && (
+    <Text
+      mt={2}
+      fontSize="sm"
+      color="fg.muted"
+    >
+      Selected: {form.color}
+    </Text>
+  )}
+</Field.Root>
             <Field.Root required>
               <Field.Label>
                 Status
