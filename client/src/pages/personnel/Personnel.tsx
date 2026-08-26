@@ -35,11 +35,8 @@ export default function Personnel() {
   const navigate = useNavigate();
   const { user } = useAuth();
 
-  const [personnel, setPersonnel] =
-    useState<User[]>([]);
-
-  const [isLoading, setIsLoading] =
-    useState(true);
+  const [personnel, setPersonnel] = useState<User[]>([]);
+  const [isLoading, setIsLoading] = useState(true);
 
   const isAdmin = user?.role === "admin";
 
@@ -48,6 +45,11 @@ export default function Personnel() {
       try {
         const data = await usersApi.getAll();
         setPersonnel(data);
+      } catch (error) {
+        console.error(
+          "Failed to load personnel:",
+          error
+        );
       } finally {
         setIsLoading(false);
       }
@@ -56,20 +58,65 @@ export default function Personnel() {
     loadPersonnel();
   }, []);
 
+  /*
+   * Determine whether this row belongs to
+   * the currently authenticated user.
+   *
+   * ID is the primary comparison.
+   * Email is a fallback in case the API returns
+   * different ID types/representations.
+   */
+  const isCurrentUser = (person: User) => {
+    if (!user) {
+      return false;
+    }
+
+    const sameId =
+      String(person.id) === String(user.id);
+
+    const sameEmail =
+      person.email.trim().toLowerCase() ===
+      user.email.trim().toLowerCase();
+
+    return sameId || sameEmail;
+  };
+
   const handleDelete = async (id: number) => {
-    if (!isAdmin) return;
+    if (!isAdmin) {
+      return;
+    }
+
+    // Never allow the authenticated user to delete themselves.
+    const person = personnel.find(
+      (item) => item.id === id
+    );
+
+    if (!person || isCurrentUser(person)) {
+      return;
+    }
 
     const confirmed = window.confirm(
       "Are you sure you want to delete this personnel member?"
     );
 
-    if (!confirmed) return;
+    if (!confirmed) {
+      return;
+    }
 
-    await usersApi.delete(id);
+    try {
+      await usersApi.delete(id);
 
-    setPersonnel((current) =>
-      current.filter((person) => person.id !== id)
-    );
+      setPersonnel((current) =>
+        current.filter(
+          (item) => item.id !== id
+        )
+      );
+    } catch (error) {
+      console.error(
+        "Failed to delete personnel:",
+        error
+      );
+    }
   };
 
   return (
@@ -94,19 +141,31 @@ export default function Personnel() {
         }
         actions={
           isAdmin
-            ? (person) => (
-                <Button
-                  size="sm"
-                  variant="ghost"
-                  colorPalette="red"
-                  onClick={(event) => {
-                    event.stopPropagation();
-                    handleDelete(person.id);
-                  }}
-                >
-                  <LuTrash2 />
-                </Button>
-              )
+            ? (person) => {
+                /*
+                 * CRITICAL:
+                 * No action is rendered for the
+                 * currently authenticated user.
+                 */
+                if (isCurrentUser(person)) {
+                  return null;
+                }
+
+                return (
+                  <Button
+                    size="sm"
+                    variant="ghost"
+                    colorPalette="red"
+                    aria-label={`Delete ${person.name}`}
+                    onClick={(event) => {
+                      event.stopPropagation();
+                      handleDelete(person.id);
+                    }}
+                  >
+                    <LuTrash2 />
+                  </Button>
+                );
+              }
             : undefined
         }
       />

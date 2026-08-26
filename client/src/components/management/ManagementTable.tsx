@@ -444,11 +444,12 @@ export function ManagementTable<
                 );
               })}
 
-              {actions && (
-                <Table.ColumnHeader textAlign="right">
-                  Actions
-                </Table.ColumnHeader>
-              )}
+             {actions &&
+  paginatedData.some((row) => actions(row) !== null) && (
+    <Table.ColumnHeader textAlign="right">
+      Actions
+    </Table.ColumnHeader>
+  )}
             </Table.Row>
           </Table.Header>
 
@@ -487,17 +488,17 @@ export function ManagementTable<
                   )
                 )}
 
-                {actions && (
-                  <Table.Cell textAlign="right">
-                    <Box
-                      onClick={(event) =>
-                        event.stopPropagation()
-                      }
-                    >
-                      {actions(row)}
-                    </Box>
-                  </Table.Cell>
-                )}
+                {actions && actions(row) !== null && (
+  <Table.Cell textAlign="right">
+    <Box
+      onClick={(event) =>
+        event.stopPropagation()
+      }
+    >
+      {actions(row)}
+    </Box>
+  </Table.Cell>
+)}
               </Table.Row>
             ))}
           </Table.Body>
@@ -581,21 +582,21 @@ export function ManagementTable<
                 )
               )}
 
-              {actions && (
-                <>
-                  <Separator my={3} />
+              {actions && actions(row) !== null && (
+  <>
+    <Separator my={3} />
 
-                  <Flex justify="flex-end">
-                    <Box
-                      onClick={(event) =>
-                        event.stopPropagation()
-                      }
-                    >
-                      {actions(row)}
-                    </Box>
-                  </Flex>
-                </>
-              )}
+    <Flex justify="flex-end">
+      <Box
+        onClick={(event) =>
+          event.stopPropagation()
+        }
+      >
+        {actions(row)}
+      </Box>
+    </Flex>
+  </>
+)}
             </Box>
           ))}
         </Flex>

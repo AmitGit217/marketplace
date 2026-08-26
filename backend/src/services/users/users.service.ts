@@ -6,6 +6,8 @@ import {
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma";
 import { CreateUserDto, UpdateUserDto } from "./dto";
+import * as bcrypt from "bcrypt";
+
 
 @Injectable()
 export class UsersService {
@@ -17,8 +19,12 @@ export class UsersService {
 
    async createUser(data: CreateUserDto) {
     try {
+      const {password, ...userData} = data;
       return await this.prismaService.user.create({
-        data,
+        data: {
+          ...userData,
+          password: await this.hashPassword(password),
+        }
       });
     } catch (error) {
       if (
@@ -33,6 +39,10 @@ export class UsersService {
       throw new BadRequestException();
     }
   }
+
+  private async hashPassword(password: string): Promise<string> {
+      return bcrypt.hash(password, 10);
+    }
 
  async getUserById(id: number) {
   const user =
@@ -62,6 +72,7 @@ export class UsersService {
 
   async updateUser(id: number, data: UpdateUserDto) {
     try {
+      const { password, ...userData } = data;
       return await this.prismaService.user.update({
         where: { id },
         data,

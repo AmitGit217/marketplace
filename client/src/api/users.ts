@@ -29,7 +29,7 @@ export const usersApi = {
   },
 
   create: async (data: CreateUserData): Promise<User> => {
-    const response = await api.post<User>("/users", data);
+    const response = await api.post<User>("/auth/register", data);
     return response.data;
   },
 
