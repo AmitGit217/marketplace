@@ -131,10 +131,6 @@ export default function VehicleForm({
 
       let imageUrl = form.image;
 
-      /*
-       * If the user selected a new image,
-       * upload it to Cloudinary first.
-       */
       if (form.imageFile) {
         const uploaded =
           await cloudinaryApi.uploadImage(
@@ -219,8 +215,16 @@ export default function VehicleForm({
     <Card.Root
       borderRadius="2xl"
       shadow="sm"
+      w="full"
+      maxW="100%"
+      minW="0"
+      overflow="hidden"
     >
-      <Card.Body p={{ base: 5, md: 8 }}>
+      <Card.Body
+        p={{ base: 5, md: 8 }}
+        w="full"
+        minW="0"
+      >
         <Heading size="md" mb={6}>
           {isEdit
             ? "Edit vehicle"
@@ -230,15 +234,19 @@ export default function VehicleForm({
         <Box
           as="form"
           onSubmit={handleSubmit}
+          w="full"
+          minW="0"
         >
           <Grid
             templateColumns={{
-              base: "1fr",
-              md: "repeat(2, 1fr)",
+              base: "minmax(0, 1fr)",
+              md: "repeat(2, minmax(0, 1fr))",
             }}
             gap={5}
+            w="full"
+            minW="0"
           >
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Brand
               </Field.Label>
@@ -254,7 +262,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Model
               </Field.Label>
@@ -270,7 +278,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Type
               </Field.Label>
@@ -286,7 +294,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Manufacture year
               </Field.Label>
@@ -305,7 +313,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Mileage
               </Field.Label>
@@ -322,7 +330,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Price
               </Field.Label>
@@ -340,7 +348,7 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Condition
               </Field.Label>
@@ -356,7 +364,10 @@ export default function VehicleForm({
               />
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root
+              required
+              minW="0"
+            >
               <Field.Label>
                 Color
               </Field.Label>
@@ -364,6 +375,8 @@ export default function VehicleForm({
               <Flex
                 wrap="wrap"
                 gap={3}
+                minW="0"
+                maxW="100%"
               >
                 {[
                   {
@@ -429,6 +442,7 @@ export default function VehicleForm({
                 ].map((color) => (
                   <Box
                     key={color.value}
+                    flexShrink={0}
                   >
                     <Button
                       type="button"
@@ -478,12 +492,15 @@ export default function VehicleForm({
               )}
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Status
               </Field.Label>
 
-              <NativeSelect.Root>
+              <NativeSelect.Root
+                w="full"
+                minW="0"
+              >
                 <NativeSelect.Field
                   value={form.status}
                   onChange={(e) =>
@@ -508,7 +525,7 @@ export default function VehicleForm({
               </NativeSelect.Root>
             </Field.Root>
 
-            <Field.Root required>
+            <Field.Root required minW="0">
               <Field.Label>
                 Acquisition date
               </Field.Label>
@@ -532,6 +549,8 @@ export default function VehicleForm({
                 base: "auto",
                 md: "1 / -1",
               }}
+              minW="0"
+              w="full"
             >
               <Field.Label>
                 Vehicle image
@@ -540,6 +559,8 @@ export default function VehicleForm({
               <Input
                 type="file"
                 accept="image/jpeg,image/png,image/webp"
+                w="full"
+                minW="0"
                 onChange={(e) => {
                   const file =
                     e.target.files?.[0] ??
@@ -557,6 +578,10 @@ export default function VehicleForm({
                   mt={2}
                   fontSize="sm"
                   color="fg.muted"
+                  maxW="full"
+                  overflow="hidden"
+                  textOverflow="ellipsis"
+                  whiteSpace="nowrap"
                 >
                   Selected:{" "}
                   {form.imageFile.name}
@@ -569,9 +594,12 @@ export default function VehicleForm({
                     mt={2}
                     fontSize="sm"
                     color="fg.muted"
+                    maxW="full"
+                    overflow="hidden"
+                    textOverflow="ellipsis"
+                    whiteSpace="nowrap"
                   >
-                    Current image:
-                    {" "}
+                    Current image:{" "}
                     {form.image}
                   </Text>
                 )}
@@ -585,6 +613,8 @@ export default function VehicleForm({
               borderRadius="md"
               bg="red.subtle"
               color="red.fg"
+              maxW="100%"
+              overflow="hidden"
             >
               {error}
             </Box>
@@ -594,6 +624,8 @@ export default function VehicleForm({
             justify="flex-end"
             gap={3}
             mt={8}
+            flexWrap="wrap"
+            w="full"
           >
             <Button
               variant="outline"
