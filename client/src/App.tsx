@@ -25,6 +25,7 @@ import Personnel from "./pages/personnel/Personnel";
 import PersonnelDetails from "./components/PersonnelDetails";
 import PersonnelCreate from "./pages/personnel/PersonnelCreate";
 import PersonnelEdit from "./pages/personnel/PersonnelEdit";
+import Profile from "./pages/Profile";
 
 function App() {
   return (
@@ -138,6 +139,13 @@ function App() {
         <Route
           path="/personnel/:id/edit"
           element={<PersonnelEdit />}
+        />
+
+
+
+        <Route
+          path="/profile"
+          element={<Profile />}
         />
       </Routes>
 
