@@ -11,14 +11,12 @@ import {
   Text,
 } from "@chakra-ui/react";
 import {
-  LuArrowLeft,
   LuLogOut,
   LuMail,
   LuShield,
   LuUser,
 } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
-
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -59,25 +57,13 @@ export default function Profile() {
       p={{ base: 4, md: 8 }}
       minW="0"
     >
-      <Button
-        variant="ghost"
-        size="sm"
-        mb={6}
-        onClick={() => navigate(-1)}
-      >
-        <LuArrowLeft />
-        Back
-      </Button>
-
       <Card.Root
         w="full"
         borderRadius="2xl"
         shadow="sm"
         overflow="hidden"
       >
-        <Card.Body
-          p={{ base: 5, md: 8 }}
-        >
+        <Card.Body p={{ base: 5, md: 8 }}>
           {/* Profile header */}
           <Flex
             align={{
@@ -124,22 +110,13 @@ export default function Profile() {
           <Separator my={8} />
 
           {/* Account information */}
-          <Heading
-            size="md"
-            mb={5}
-          >
+          <Heading size="md" mb={5}>
             Account information
           </Heading>
 
-          <Flex
-            direction="column"
-            gap={5}
-          >
+          <Flex direction="column" gap={5}>
             {/* Name */}
-            <Flex
-              align="center"
-              gap={4}
-            >
+            <Flex align="center" gap={4}>
               <Box
                 p={3}
                 borderRadius="lg"
@@ -167,10 +144,7 @@ export default function Profile() {
             </Flex>
 
             {/* Email */}
-            <Flex
-              align="center"
-              gap={4}
-            >
+            <Flex align="center" gap={4}>
               <Box
                 p={3}
                 borderRadius="lg"
@@ -198,10 +172,7 @@ export default function Profile() {
             </Flex>
 
             {/* Role */}
-            <Flex
-              align="center"
-              gap={4}
-            >
+            <Flex align="center" gap={4}>
               <Box
                 p={3}
                 borderRadius="lg"
@@ -229,18 +200,7 @@ export default function Profile() {
           <Separator my={8} />
 
           {/* Actions */}
-          <Flex
-            justify="flex-end"
-            gap={3}
-            flexWrap="wrap"
-          >
-            <Button
-              variant="outline"
-              onClick={() => navigate(-1)}
-            >
-              Back
-            </Button>
-
+          <Flex justify="flex-end">
             <Button
               colorPalette="red"
               onClick={handleLogout}

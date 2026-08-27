@@ -44,6 +44,7 @@ function BackButton() {
     "/sales",
     "/clients",
     "/personnel",
+    "/profile"
   ];
 
   /*
