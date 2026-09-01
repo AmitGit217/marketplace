@@ -1,5 +1,5 @@
+import { useEffect, useState } from "react";
 import {
-  Badge,
   Box,
   Button,
   Card,
@@ -13,7 +13,6 @@ import {
   Spinner,
   Text,
 } from "@chakra-ui/react";
-import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import {
   LuArrowLeft,
@@ -27,32 +26,37 @@ import {
 
 import type { Vehicle } from "@/types/vehicle";
 import { vehiclesApi } from "@/api/vehicles";
-import { ColorSpecification, parseRgbColor } from "@/utils/ColorSpecification";
+import { ColorSpecification } from "@/utils/ColorSpecification";
+import { ROUTES } from "@/utils/consts";
+
+const formatCurrency = (value: number | string) =>
+  `€${Number(value).toLocaleString()}`;
+
+const formatNumber = (value: number) =>
+  value.toLocaleString();
+
+const formatDate = (value: string) =>
+  new Date(value).toLocaleDateString();
 
 export default function VehicleDetails() {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const [vehicle, setVehicle] =
-    useState<Vehicle | null>(null);
-
-  const [isLoading, setIsLoading] =
-    useState(true);
+  const [vehicle, setVehicle] = useState<Vehicle | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
+    if (!id) {
+      setIsLoading(false);
+      return;
+    }
+
     const loadVehicle = async () => {
-      if (!id) return;
-
       try {
-        const data =
-          await vehiclesApi.getById(id);
-
+        const data = await vehiclesApi.getById(id);
         setVehicle(data);
       } catch (error) {
-        console.error(
-          "Failed to load vehicle:",
-          error
-        );
+        console.error("Failed to load vehicle:", error);
       } finally {
         setIsLoading(false);
       }
@@ -63,15 +67,8 @@ export default function VehicleDetails() {
 
   if (isLoading) {
     return (
-      <Flex
-        minH="400px"
-        align="center"
-        justify="center"
-      >
-        <Spinner
-          size="xl"
-          colorPalette="brand"
-        />
+      <Flex minH="400px" align="center" justify="center">
+        <Spinner size="xl" colorPalette="brand" />
       </Flex>
     );
   }
@@ -85,15 +82,11 @@ export default function VehicleDetails() {
         direction="column"
         gap={4}
       >
-        <Heading size="md">
-          Vehicle not found
-        </Heading>
+        <Heading size="md">Vehicle not found</Heading>
 
         <Button
           variant="outline"
-          onClick={() =>
-            navigate("/vehicles")
-          }
+          onClick={() => navigate(ROUTES.vehicles)}
         >
           <LuArrowLeft />
           Back to vehicles
@@ -102,20 +95,16 @@ export default function VehicleDetails() {
     );
   }
 
+  const vehicleName = `${vehicle.brand} ${vehicle.model}`;
+
   return (
     <Box maxW="1400px" mx="auto">
-      {/* Back + Edit */}
-      <Flex
-        justify="space-between"
-        align="center"
-        mb={6}
-      >
+      {/* Navigation */}
+      <Flex justify="space-between" align="center" mb={6}>
         <Button
           variant="ghost"
           size="sm"
-          onClick={() =>
-            navigate("/vehicles")
-          }
+          onClick={() => navigate(ROUTES.vehicles)}
         >
           <LuArrowLeft />
           Back to vehicles
@@ -124,9 +113,7 @@ export default function VehicleDetails() {
         <Button
           colorPalette="brand"
           onClick={() =>
-            navigate(
-              `/vehicles/${vehicle.id}/edit`
-            )
+            navigate(ROUTES.vehicleEdit(vehicle.id))
           }
         >
           <LuPencil />
@@ -135,24 +122,17 @@ export default function VehicleDetails() {
       </Flex>
 
       {/* Main vehicle card */}
-      <Card.Root
-        overflow="hidden"
-        borderRadius="2xl"
-        shadow="sm"
-      >
+      <Card.Root overflow="hidden" borderRadius="xl" shadow="sm">
         <Grid
           templateColumns={{
             base: "1fr",
             lg: "1.1fr 1fr",
           }}
         >
-          {/* IMAGE */}
+          {/* Image */}
           <Box
             position="relative"
-            bg="gray.100"
-            _dark={{
-              bg: "gray.800",
-            }}
+            bg="surfaceAlt"
             minH={{
               base: "280px",
               md: "400px",
@@ -161,7 +141,7 @@ export default function VehicleDetails() {
           >
             <Image
               src={vehicle.image}
-              alt={`${vehicle.brand} ${vehicle.model}`}
+              alt={vehicleName}
               w="100%"
               h="100%"
               minH={{
@@ -172,31 +152,33 @@ export default function VehicleDetails() {
               objectFit="cover"
             />
 
-            <Box
-              position="absolute"
-              top={4}
-              right={4}
-            >
-              <Badge
-                size="lg"
-                variant="solid"
-                colorPalette={
+            <Box position="absolute" top={4} right={4}>
+              <Box
+                as="span"
+                px={3}
+                py={1}
+                borderRadius="full"
+                bg={
                   vehicle.status === "available"
-                    ? "green"
-                    : "gray"
+                    ? "success"
+                    : "surfaceAlt"
                 }
+                color={
+                  vehicle.status === "available"
+                    ? "white"
+                    : "text"
+                }
+                fontSize="sm"
+                fontWeight="600"
               >
                 {vehicle.status}
-              </Badge>
+              </Box>
             </Box>
           </Box>
 
-          {/* INFORMATION */}
+          {/* Information */}
           <Box p={{ base: 5, md: 8 }}>
-            <Flex
-              direction="column"
-              h="100%"
-            >
+            <Flex direction="column" h="100%">
               <Box>
                 <Text
                   fontSize="sm"
@@ -215,28 +197,19 @@ export default function VehicleDetails() {
                     md: "2xl",
                   }}
                 >
-                  {vehicle.brand}{" "}
-                  {vehicle.model}
+                  {vehicleName}
                 </Heading>
 
-                <HStack mt={2} gap={2}>
-  <Text color="fg.muted">
-    {vehicle.manufactureYear} 
-  </Text>
-
-  
-</HStack>
+                <Text color="fg.muted" mt={2}>
+                  {vehicle.manufactureYear}
+                </Text>
               </Box>
 
               <Separator my={6} />
 
               {/* Price */}
               <Box>
-                <Text
-                  fontSize="sm"
-                  color="fg.muted"
-                  mb={1}
-                >
+                <Text fontSize="sm" color="fg.muted" mb={1}>
                   Price
                 </Text>
 
@@ -248,10 +221,7 @@ export default function VehicleDetails() {
                   fontWeight="700"
                   color="colorPalette.500"
                 >
-                  €
-                  {Number(
-                    vehicle.price
-                  ).toLocaleString()}
+                  {formatCurrency(vehicle.price)}
                 </Text>
               </Box>
 
@@ -274,15 +244,13 @@ export default function VehicleDetails() {
                 <Specification
                   icon={<LuCalendar />}
                   label="Year"
-                  value={String(
-                    vehicle.manufactureYear
-                  )}
+                  value={String(vehicle.manufactureYear)}
                 />
 
                 <Specification
                   icon={<LuCircleGauge />}
                   label="Mileage"
-                  value={`${vehicle.mileage.toLocaleString()} km`}
+                  value={`${formatNumber(vehicle.mileage)} km`}
                 />
 
                 <Specification
@@ -291,9 +259,7 @@ export default function VehicleDetails() {
                   value={vehicle.condition}
                 />
 
-                <ColorSpecification
-                  color={vehicle.color}
-                />
+                <ColorSpecification color={vehicle.color} />
 
                 <Specification
                   icon={<LuTag />}
@@ -303,14 +269,8 @@ export default function VehicleDetails() {
               </SimpleGrid>
 
               <Box mt="auto" pt={8}>
-                <Text
-                  fontSize="xs"
-                  color="fg.muted"
-                >
-                  Acquired on{" "}
-                  {new Date(
-                    vehicle.acquisitionDate
-                  ).toLocaleDateString()}
+                <Text fontSize="xs" color="fg.muted">
+                  Acquired on {formatDate(vehicle.acquisitionDate)}
                 </Text>
               </Box>
             </Flex>
@@ -319,14 +279,8 @@ export default function VehicleDetails() {
       </Card.Root>
 
       {/* Additional information */}
-      <Card.Root
-        mt={6}
-        borderRadius="2xl"
-        shadow="sm"
-      >
-        <Card.Body
-          p={{ base: 5, md: 8 }}
-        >
+      <Card.Root mt={6} borderRadius="xl" shadow="sm">
+        <Card.Body p={{ base: 5, md: 8 }}>
           <Heading size="md" mb={5}>
             Vehicle information
           </Heading>
@@ -343,31 +297,20 @@ export default function VehicleDetails() {
               value={String(vehicle.id)}
             />
 
-            <InfoRow
-              label="Brand"
-              value={vehicle.brand}
-            />
+            <InfoRow label="Brand" value={vehicle.brand} />
 
-            <InfoRow
-              label="Model"
-              value={vehicle.model}
-            />
+            <InfoRow label="Model" value={vehicle.model} />
 
-            <InfoRow
-              label="Type"
-              value={vehicle.type}
-            />
+            <InfoRow label="Type" value={vehicle.type} />
 
             <InfoRow
               label="Manufacture year"
-              value={String(
-                vehicle.manufactureYear
-              )}
+              value={String(vehicle.manufactureYear)}
             />
 
             <InfoRow
               label="Mileage"
-              value={`${vehicle.mileage.toLocaleString()} km`}
+              value={`${formatNumber(vehicle.mileage)} km`}
             />
 
             <InfoRow
@@ -375,12 +318,9 @@ export default function VehicleDetails() {
               value={vehicle.condition}
             />
 
-       
             <InfoRow
               label="Acquisition date"
-              value={new Date(
-                vehicle.acquisitionDate
-              ).toLocaleDateString()}
+              value={formatDate(vehicle.acquisitionDate)}
             />
 
             <InfoRow
@@ -421,18 +361,11 @@ function Specification({
       </Flex>
 
       <Box>
-        <Text
-          fontSize="xs"
-          color="fg.muted"
-          mb={0.5}
-        >
+        <Text fontSize="xs" color="fg.muted" mb={0.5}>
           {label}
         </Text>
 
-        <Text
-          fontSize="sm"
-          fontWeight="600"
-        >
+        <Text fontSize="sm" fontWeight="600">
           {value}
         </Text>
       </Box>
@@ -445,10 +378,7 @@ interface InfoRowProps {
   value: string;
 }
 
-function InfoRow({
-  label,
-  value,
-}: InfoRowProps) {
+function InfoRow({ label, value }: InfoRowProps) {
   return (
     <Flex
       justify="space-between"
@@ -456,10 +386,7 @@ function InfoRow({
       borderBottomWidth="1px"
       pb={3}
     >
-      <Text
-        fontSize="sm"
-        color="fg.muted"
-      >
+      <Text fontSize="sm" color="fg.muted">
         {label}
       </Text>
 
