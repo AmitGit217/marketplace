@@ -4,12 +4,20 @@ import { LuPlus } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
 import type { Vehicle } from "@/types/vehicle";
-
 import { vehiclesApi } from "@/api/vehicles";
+
 import {
   ManagementTable,
   type TableColumn,
 } from "@/components/management/ManagementTable";
+import { ROUTES } from "@/utils/consts";
+
+
+const formatMileage = (value: string | number) =>
+  `${Number(value).toLocaleString()} km`;
+
+const formatPrice = (value: string | number) =>
+  `€${Number(value).toLocaleString()}`;
 
 const vehicleColumns: TableColumn<Vehicle>[] = [
   {
@@ -31,14 +39,12 @@ const vehicleColumns: TableColumn<Vehicle>[] = [
   {
     key: "mileage",
     label: "Mileage",
-    render: (value) =>
-      `${value.toLocaleString()} km`,
+    render: formatMileage,
   },
   {
     key: "price",
     label: "Price",
-    render: (value) =>
-      `€${Number(value).toLocaleString()}`,
+    render: formatPrice,
   },
   {
     key: "status",
@@ -58,10 +64,7 @@ export default function Vehicles() {
         const data = await vehiclesApi.getAll();
         setVehicles(data);
       } catch (error) {
-        console.error(
-          "Failed to load vehicles:",
-          error
-        );
+        console.error("Failed to load vehicles:", error);
       } finally {
         setIsLoading(false);
       }
@@ -73,11 +76,7 @@ export default function Vehicles() {
   return (
     <Flex direction="column" gap={4}>
       <Flex justify="flex-end">
-        <Button
-          onClick={() =>
-            navigate("/vehicles/new")
-          }
-        >
+        <Button onClick={() => navigate(ROUTES.vehicleNew)}>
           <LuPlus />
           Create Vehicle
         </Button>
@@ -88,7 +87,7 @@ export default function Vehicles() {
         columns={vehicleColumns}
         isLoading={isLoading}
         onRowClick={(vehicle) =>
-          navigate(`/vehicles/${vehicle.id}`)
+          navigate(ROUTES.vehicle(vehicle.id))
         }
       />
     </Flex>
