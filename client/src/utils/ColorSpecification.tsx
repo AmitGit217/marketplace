@@ -1,20 +1,17 @@
 import { Box, Flex, HStack, Text } from "@chakra-ui/react";
 import { LuPalette } from "react-icons/lu";
 
-function parseRgbColor(color: string) {
+export function parseRgbColor(color: string) {
   const match = color.match(
-    /\(?\s*(\d+)[,\s.]+(\d+)[,\s.]+(\d+)\s*\)?/
+    /\(?\s*(\d+)\s*[,.]\s*(\d+)\s*[,.]\s*(\d+)\s*\)?/
   );
 
-  if (!match) {
-    return null;
-  }
+  if (!match) return null;
 
   const [, r, g, b] = match;
 
   return `rgb(${r}, ${g}, ${b})`;
 }
-
 interface ColorSpecificationProps {
   color: string;
 }
@@ -48,23 +45,20 @@ function ColorSpecification({
           Color
         </Text>
 
-        <HStack gap={2}>
-          {cssColor && (
-            <Box
-              w="20px"
-              h="20px"
-              borderRadius="full"
-              bg={cssColor}
-              borderWidth="1px"
-              borderColor="border"
-            />
-          )}
-
-      
-        </HStack>
+        {cssColor && (
+          <Box
+            w="32px"
+            h="32px"
+            borderRadius="full"
+            bg={cssColor}
+            borderWidth="1px"
+            borderColor="border"
+          />
+        )}
       </Box>
     </HStack>
   );
 }
 
 export { ColorSpecification };
+

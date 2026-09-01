@@ -14,7 +14,6 @@ import Dashboard from "./pages/Dashboard";
 import Auth from "./pages/Auth";
 
 import Vehicles from "./pages/vehicle/Vehicles";
-import VehicleDetails from "./pages/VehicleDetails";
 import VehicleCreate from "./pages/vehicle/VehicleCreate";
 import VehicleEdit from "./pages/vehicle/VechicleEdit";
 
@@ -34,6 +33,7 @@ import PersonnelCreate from "./pages/personnel/PersonnelCreate";
 import PersonnelEdit from "./pages/personnel/PersonnelEdit";
 
 import Profile from "./pages/Profile";
+import VehicleDetails from "./pages/vehicle/VehicleDetails";
 
 function BackButton() {
   const navigate = useNavigate();

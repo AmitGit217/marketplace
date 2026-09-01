@@ -27,7 +27,7 @@ import {
 
 import type { Vehicle } from "@/types/vehicle";
 import { vehiclesApi } from "@/api/vehicles";
-import { ColorSpecification } from "@/utils/ColorSpecification";
+import { ColorSpecification, parseRgbColor } from "@/utils/ColorSpecification";
 
 export default function VehicleDetails() {
   const { id } = useParams();
@@ -219,13 +219,13 @@ export default function VehicleDetails() {
                   {vehicle.model}
                 </Heading>
 
-                <Text
-                  mt={2}
-                  color="fg.muted"
-                >
-                  {vehicle.manufactureYear} ·{" "}
-                  {vehicle.color}
-                </Text>
+                <HStack mt={2} gap={2}>
+  <Text color="fg.muted">
+    {vehicle.manufactureYear} 
+  </Text>
+
+  
+</HStack>
               </Box>
 
               <Separator my={6} />
@@ -375,11 +375,7 @@ export default function VehicleDetails() {
               value={vehicle.condition}
             />
 
-            <InfoRow
-              label="Color"
-              value={vehicle.color}
-            />
-
+       
             <InfoRow
               label="Acquisition date"
               value={new Date(
