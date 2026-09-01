@@ -1,21 +1,30 @@
 import { useEffect, useState } from "react";
 import {
   Box,
-  Container,
-  SimpleGrid,
-  Stat,
-  Text,
-  Heading,
   CardBody,
-  VStack,
+  CardRoot,
+  Container,
+  Heading,
   HStack,
   Progress,
+  SimpleGrid,
   Spinner,
-  CardRoot,
+  Stat,
+  Text,
+  VStack,
 } from "@chakra-ui/react";
 
 import type { DashboardData } from "@/types/dashboard";
 import { getDashboardData } from "@/api/dashboard";
+
+const formatCurrency = (value: number, decimals = 2) =>
+  `€${value.toLocaleString("en-US", {
+    minimumFractionDigits: decimals,
+    maximumFractionDigits: decimals,
+  })}`;
+
+const formatDate = (date: string) =>
+  new Date(date).toLocaleDateString();
 
 export default function Dashboard() {
   const [dashboard, setDashboard] = useState<DashboardData | null>(null);
@@ -24,8 +33,10 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchDashboard = async () => {
       try {
-        const response = await getDashboardData();
-        setDashboard(response.data);
+        const { data } = await getDashboardData();
+        setDashboard(data);
+      } catch (error) {
+        console.error("Failed to load dashboard:", error);
       } finally {
         setLoading(false);
       }
@@ -37,7 +48,7 @@ export default function Dashboard() {
   if (loading) {
     return (
       <Box
-        minH="100vh"
+        minH="60vh"
         display="flex"
         alignItems="center"
         justifyContent="center"
@@ -49,9 +60,11 @@ export default function Dashboard() {
 
   if (!dashboard) {
     return (
-      <Box p={6}>
-        <Text>Unable to load dashboard data.</Text>
-      </Box>
+      <Container maxW="7xl" py={10}>
+        <Text color="textMuted">
+          Unable to load dashboard data.
+        </Text>
+      </Container>
     );
   }
 
@@ -63,22 +76,21 @@ export default function Dashboard() {
       : 0;
 
   return (
-    <Box minH="100vh" py={6}>
-      <Container maxW="container.lg">
+    <Box py={6}>
+      <Container maxW="7xl">
         <VStack align="stretch" gap={6}>
 
           {/* Header */}
           <Box>
             <Heading size="lg">Dashboard</Heading>
 
-            <Text color="gray.500" mt={1}>
+            <Text color="textMuted" mt={1}>
               Overview of your dealership
             </Text>
 
             {dataThrough && (
-              <Text color="gray.500" fontSize="sm" mt={2}>
-                Data through{" "}
-                {new Date(dataThrough).toLocaleDateString()}
+              <Text color="textMuted" fontSize="sm" mt={2}>
+                Data through {formatDate(dataThrough)}
               </Text>
             )}
           </Box>
@@ -90,11 +102,7 @@ export default function Dashboard() {
                 <Stat.Label>Revenue — Last 30 Days</Stat.Label>
 
                 <Stat.ValueText fontSize="4xl">
-                  €
-                  {recent.revenue.toLocaleString("en-US", {
-                    minimumFractionDigits: 2,
-                    maximumFractionDigits: 2,
-                  })}
+                  {formatCurrency(recent.revenue)}
                 </Stat.ValueText>
 
                 <Stat.HelpText>
@@ -105,7 +113,10 @@ export default function Dashboard() {
           </CardRoot>
 
           {/* Recent KPIs */}
-          <SimpleGrid columns={{ base: 2, md: 2 }} gap={4}>
+          <SimpleGrid
+            columns={{ base: 1, sm: 2 }}
+            gap={4}
+          >
             <CardRoot>
               <CardBody>
                 <Stat.Root>
@@ -146,14 +157,13 @@ export default function Dashboard() {
                 <Box>
                   <Heading size="md">Inventory</Heading>
 
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="textMuted" fontSize="sm">
                     Current vehicle inventory
                   </Text>
                 </Box>
 
                 <HStack justify="space-between">
                   <Text>Total vehicles</Text>
-
                   <Text fontWeight="bold">
                     {inventory.totalVehicles}
                   </Text>
@@ -161,7 +171,6 @@ export default function Dashboard() {
 
                 <HStack justify="space-between">
                   <Text>Available</Text>
-
                   <Text fontWeight="bold">
                     {inventory.availableVehicles}
                   </Text>
@@ -169,7 +178,6 @@ export default function Dashboard() {
 
                 <HStack justify="space-between">
                   <Text>Sold</Text>
-
                   <Text fontWeight="bold">
                     {inventory.soldVehicles}
                   </Text>
@@ -181,7 +189,10 @@ export default function Dashboard() {
                       Inventory sold
                     </Text>
 
-                    <Text fontSize="sm" fontWeight="medium">
+                    <Text
+                      fontSize="sm"
+                      fontWeight="medium"
+                    >
                       {soldPercentage.toFixed(0)}%
                     </Text>
                   </HStack>
@@ -209,7 +220,7 @@ export default function Dashboard() {
                     Sales History
                   </Heading>
 
-                  <Text color="gray.500" fontSize="sm">
+                  <Text color="textMuted" fontSize="sm">
                     Yearly sales performance
                   </Text>
                 </Box>
@@ -218,21 +229,19 @@ export default function Dashboard() {
                   <HStack
                     key={item.year}
                     justify="space-between"
+                    gap={4}
                   >
                     <Text fontWeight="medium">
                       {item.year}
                     </Text>
 
                     <HStack gap={6}>
-                      <Text>
+                      <Text color="textMuted">
                         {item.sales} sales
                       </Text>
 
                       <Text fontWeight="bold">
-                        €
-                        {item.revenue.toLocaleString("en-US", {
-                          maximumFractionDigits: 0,
-                        })}
+                        {formatCurrency(item.revenue, 0)}
                       </Text>
                     </HStack>
                   </HStack>

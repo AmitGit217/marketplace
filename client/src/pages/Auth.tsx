@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { Button } from "@chakra-ui/react";
+
 import { AuthCard } from "@/components/auth/AuthCard";
 import { LoginForm } from "@/components/auth/LoginForm";
 import { RegisterForm } from "@/components/auth/RegisterForm";
@@ -7,10 +8,6 @@ import { AuthLayout } from "@/components/auth/AuthLayout";
 
 export default function Auth() {
   const [isLogin, setIsLogin] = useState(true);
-
-  const handleSwitch = () => {
-    setIsLogin((prev) => !prev);
-  };
 
   return (
     <AuthLayout>
@@ -26,9 +23,9 @@ export default function Auth() {
 
         <Button
           mt={6}
-          variant="ghost"
           width="full"
-          onClick={handleSwitch}
+          variant="ghost"
+          onClick={() => setIsLogin((prev) => !prev)}
         >
           {isLogin
             ? "Don't have an account? Register"
