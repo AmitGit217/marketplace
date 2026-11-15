@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { PrismaService } from "../../../prisma/prisma";
 import { CreateSaleDto } from "./dto";
@@ -71,7 +72,28 @@ export class SalesService {
     }
   }
 
-  async deleteSale(id: number) {
+  async deleteSale(
+    id: number,
+    actor: { sub?: number; role?: string },
+  ) {
+    const sale = await this.prismaService.sale.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!sale) {
+      throw new NotFoundException(`Sale with id ${id} not found`);
+    }
+
+    const actorId = Number(actor?.sub);
+    const isOwner = Number.isInteger(actorId) && actorId === sale.userId;
+
+    if (actor?.role !== "admin" && !isOwner) {
+      throw new ForbiddenException(
+        "You do not have permission to access this resource",
+      );
+    }
+
     try {
       return await this.prismaService.sale.delete({
         where: { id },
