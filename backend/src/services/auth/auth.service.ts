@@ -28,12 +28,12 @@ export class AuthService {
       throw new ConflictException("Email already exists");
     }
 
-    const { password, ...rest } = data;
-
     const user = await this.prismaService.user.create({
       data: {
-        ...rest,
-        password: await this.hashPassword(password),
+        name: data.name,
+        email: data.email,
+        password: await this.hashPassword(data.password),
+        role: "user",
       },
     });
 

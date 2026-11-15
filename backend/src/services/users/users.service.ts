@@ -2,6 +2,7 @@ import {
   Injectable,
   NotFoundException,
   BadRequestException,
+  ForbiddenException,
 } from "@nestjs/common";
 import { Prisma } from "../../../generated/prisma/client";
 import { PrismaService } from "../../../prisma/prisma";
@@ -14,19 +15,34 @@ export class UsersService {
   constructor(private readonly prismaService: PrismaService) {}
 
   async getUsers() {
-    return this.prismaService.user.findMany();
+    return this.prismaService.user.findMany({
+      omit: { password: true },
+    });
   }
 
-   async createUser(data: CreateUserDto) {
+   async createUser(data: CreateUserDto, actorRole?: string) {
     try {
-      const {password, ...userData} = data;
+      const { password, role, ...userData } = data;
+
+      if (role === "admin" && actorRole !== "admin") {
+        throw new ForbiddenException(
+          "Only an admin can assign the admin role",
+        );
+      }
+
       return await this.prismaService.user.create({
         data: {
           ...userData,
+          ...(role ? { role } : {}),
           password: await this.hashPassword(password),
-        }
+        },
+        omit: { password: true },
       });
     } catch (error) {
+      if (error instanceof ForbiddenException) {
+        throw error;
+      }
+
       if (
         error instanceof Prisma.PrismaClientKnownRequestError &&
         error.code === "P2002"
@@ -48,6 +64,7 @@ export class UsersService {
   const user =
     await this.prismaService.user.findUnique({
       where: { id },
+      omit: { password: true },
       include: {
         sales: {
           include: {
@@ -75,7 +92,13 @@ export class UsersService {
       const { password, ...userData } = data;
       return await this.prismaService.user.update({
         where: { id },
-        data,
+        data: {
+          ...userData,
+          ...(password
+            ? { password: await this.hashPassword(password) }
+            : {}),
+        },
+        omit: { password: true },
       });
     } catch (error) {
       if (
@@ -93,6 +116,7 @@ export class UsersService {
     try {
       return await this.prismaService.user.delete({
         where: { id },
+        omit: { password: true },
       });
     } catch (error) {
       if (

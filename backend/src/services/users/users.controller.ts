@@ -12,6 +12,8 @@ import {
 
 import { UsersService } from "./users.service";
 import { AuthGuard } from "../../guards/auth.guard";
+import { AdminRoleGuard } from "../../guards/isAdmin.guard";
+import { CurrentUser } from "../../decorators/CurrentUser";
 import { CreateUserDto, UpdateUserDto } from "./dto";
 
 @UseGuards(AuthGuard)
@@ -30,11 +32,15 @@ export class UsersController {
   }
 
   @Post()
-  createUser(@Body() data: CreateUserDto) {
-    return this.usersService.createUser(data);
+  createUser(
+    @Body() data: CreateUserDto,
+    @CurrentUser() actor: { role?: string },
+  ) {
+    return this.usersService.createUser(data, actor?.role);
   }
 
   @Patch(":id")
+  @UseGuards(AdminRoleGuard)
   updateUser(
     @Param("id", ParseIntPipe) id: number,
     @Body() data: UpdateUserDto,
@@ -43,6 +49,7 @@ export class UsersController {
   }
 
   @Delete(":id")
+  @UseGuards(AdminRoleGuard)
   deleteUser(@Param("id", ParseIntPipe) id: number) {
     return this.usersService.deleteUser(id);
   }
