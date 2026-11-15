@@ -40,11 +40,16 @@ const vehicle = {
 
     await app.init();
 
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+    if (!adminPassword) {
+      throw new Error("SEED_ADMIN_PASSWORD is not set");
+    }
+
     const res = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
         email: "admin@example.com",
-        password: "admin123",
+        password: adminPassword,
       })
       .expect(200);
 
