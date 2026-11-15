@@ -14,6 +14,10 @@ export class AuthGuard implements CanActivate {
 
   async canActivate(context: ExecutionContext): Promise<boolean> {
     const request = context.switchToHttp().getRequest();
+    if (!process.env.JWT_SECRET) {
+      throw new UnauthorizedException("JWT_SECRET is not set");
+    }
+
     const token = this.extractTokenFromHeader(request);
     if (!token) {
       throw new UnauthorizedException();

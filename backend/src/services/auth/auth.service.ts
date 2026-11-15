@@ -18,6 +18,8 @@ export class AuthService {
   ) {}
 
   async registerUser(data: RegisterDto) {
+    this.assertJwtSecret();
+
     const existingUser = await this.prismaService.user.findUnique({
       where: { email: data.email },
     });
@@ -44,6 +46,8 @@ export class AuthService {
   }
 
   async loginUser(data: LoginDto) {
+    this.assertJwtSecret();
+
     const user = await this.prismaService.user.findUnique({
       where: { email: data.email },
     });
@@ -73,7 +77,15 @@ export class AuthService {
     return bcrypt.hash(password, 10);
   }
 
+  private assertJwtSecret(): void {
+    if (!process.env.JWT_SECRET) {
+      throw new UnauthorizedException("JWT_SECRET is not set");
+    }
+  }
+
   private createToken(user: User): string {
+    this.assertJwtSecret();
+
     return this.jwtService.sign({
       sub: user.id,
       name: user.name,

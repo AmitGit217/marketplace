@@ -7,7 +7,7 @@ import { vehiclesApi } from "@/api/vehicles";
 import { clientsApi } from "@/api/clients";
 
 import type { Sale } from "@/types/sale";
-import type { SaleFormData } from "@/components/SalesFrom";
+import type { SaleFormData, VehicleOption } from "@/components/SalesFrom";
 import SaleForm from "@/components/SalesFrom";
 
 
@@ -20,9 +20,7 @@ export default function SaleEdit() {
     useState<Sale | null>(null);
 
   const [vehicles, setVehicles] =
-    useState<
-      { id: number | string; label: string }[]
-    >([]);
+    useState<VehicleOption[]>([]);
 
   const [clients, setClients] =
     useState<
@@ -58,7 +56,8 @@ export default function SaleEdit() {
         setVehicles(
           vehicleData.map((vehicle) => ({
             id: vehicle.id,
-            label: `${vehicle.brand} ${vehicle.model}`,
+            brand: vehicle.brand,
+            model: vehicle.model,
           })),
         );
 

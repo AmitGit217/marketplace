@@ -1,10 +1,15 @@
 import { toaster } from "@/components/ui/toaster";
 import axios from "axios";
 
+const configuredApiUrl = (import.meta.env.VITE_API_URL ?? "")
+  .trim()
+  .replace(/\/+$/, "");
+
 const api = axios.create({
-  baseURL: import.meta.env.VITE_API_URL,
+  baseURL: configuredApiUrl,
   headers: {
     "Content-Type": "application/json",
+    Accept: "application/json",
   },
 });
 
