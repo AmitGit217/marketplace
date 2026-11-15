@@ -19,7 +19,6 @@ const AuthContext = createContext<AuthContextType | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
-  const [isLoading, setIsLoading] = useState(true);
 
   const isLoggedIn = !!user;
 
@@ -29,7 +28,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       const token = localStorage.getItem("token");
 
       if (!token) {
-        setIsLoading(false);
         return;
       }
 
@@ -39,8 +37,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch {
         localStorage.removeItem("token");
         setUser(null);
-      } finally {
-        setIsLoading(false);
       }
     };
 

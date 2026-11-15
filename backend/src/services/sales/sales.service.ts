@@ -15,7 +15,7 @@ export class SalesService {
         include: {
           client: true,
           vehicle: true,
-          user: true,
+          user: { omit: { password: true } },
         },
         orderBy: {
           saleDate: "desc",
@@ -29,7 +29,7 @@ export class SalesService {
     include: {
       client: true,
       vehicle: true,
-      user: true,
+      user: { omit: { password: true } },
     },
   });
 

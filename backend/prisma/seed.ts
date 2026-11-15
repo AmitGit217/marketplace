@@ -177,6 +177,15 @@ function generateDemoVehicle(
 // --------------------------------------------------
 
 async function main() {
+  const alreadySeeded = await prisma.user.findUnique({
+    where: { email: "admin@example.com" },
+  });
+
+  if (alreadySeeded) {
+    console.log("Seed already applied; leaving existing data in place.");
+    return;
+  }
+
   const dataPath = path.join(
     process.cwd(),
     "prisma",
@@ -224,14 +233,14 @@ async function main() {
   //
   // --------------------------------------------------
 
-  await prisma.$executeRawUnsafe(`
+  await prisma.$executeRaw`
     TRUNCATE TABLE
       sales,
       vehicles,
       clients,
       users
-    RESTART IDENTITY CASCADE;
-  `);
+    RESTART IDENTITY CASCADE
+  `;
 
   // --------------------------------------------------
   // ADMIN USER

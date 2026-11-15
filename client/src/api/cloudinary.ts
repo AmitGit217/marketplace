@@ -7,10 +7,17 @@ export interface CloudinaryUploadResponse {
   bytes: number;
 }
 
+export function isCloudinaryConfigured(): boolean {
+  const cloudName = import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
+  const uploadPreset = import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
+
+  return Boolean(cloudName && uploadPreset);
+}
+
 export const cloudinaryApi = {
   uploadImage: async (
     file: File
-  ): Promise<CloudinaryUploadResponse> => {
+  ): Promise<CloudinaryUploadResponse | null> => {
     const cloudName =
       import.meta.env.VITE_CLOUDINARY_CLOUD_NAME;
 
@@ -18,9 +25,7 @@ export const cloudinaryApi = {
       import.meta.env.VITE_CLOUDINARY_UPLOAD_PRESET;
 
     if (!cloudName || !uploadPreset) {
-      throw new Error(
-        "Cloudinary configuration is missing."
-      );
+      return null;
     }
 
     const formData = new FormData();

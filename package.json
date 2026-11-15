@@ -1,0 +1,14 @@
+{
+  "name": "marketplace",
+  "private": true,
+  "version": "0.0.1",
+  "scripts": {
+    "build": "npm install --include=dev --prefix client && npm install --include=dev --prefix backend && npm run build --prefix client && npm run build --prefix backend",
+    "start": "node scripts/start.mjs",
+    "dev:client": "npm run dev --prefix client",
+    "dev:backend": "npm run start:dev --prefix backend"
+  },
+  "engines": {
+    "node": ">=20"
+  }
+}

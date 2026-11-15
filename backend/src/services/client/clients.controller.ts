@@ -7,15 +7,18 @@ import {
   Param,
   Body,
   ParseIntPipe,
+  UseGuards,
 } from "@nestjs/common";
 
 import { ClientsService } from "./clients.service";
+import { AuthGuard } from "../../guards/auth.guard";
 
 import {
   CreateClientDto,
   UpdateClientDto,
 } from "./dto";
 
+@UseGuards(AuthGuard)
 @Controller("clients")
 export class ClientsController {
   constructor(

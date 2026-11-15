@@ -19,7 +19,6 @@ import {
   LuCalendar,
   LuCar,
   LuCreditCard,
-  LuMail,
   LuUser,
 } from "react-icons/lu";
 

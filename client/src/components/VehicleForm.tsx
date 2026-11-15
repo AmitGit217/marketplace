@@ -146,7 +146,9 @@ export default function VehicleForm({
             form.imageFile
           );
 
-        imageUrl = uploaded.secure_url;
+        if (uploaded) {
+          imageUrl = uploaded.secure_url;
+        }
       }
 
       const baseData = {
