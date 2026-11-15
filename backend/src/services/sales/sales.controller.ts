@@ -35,7 +35,10 @@ export class SalesController {
   }
 
   @Delete(":id")
-  deleteSale(@Param("id", ParseIntPipe) id: number) {
-    return this.salesService.deleteSale(id);
+  deleteSale(
+    @Param("id", ParseIntPipe) id: number,
+    @CurrentUser() user: { sub?: number; role?: string },
+  ) {
+    return this.salesService.deleteSale(id, user);
   }
 }

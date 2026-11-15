@@ -35,11 +35,16 @@ describe("Users (e2e)", () => {
 
     await app.init();
 
+    const adminPassword = process.env.SEED_ADMIN_PASSWORD;
+    if (!adminPassword) {
+      throw new Error("SEED_ADMIN_PASSWORD is not set");
+    }
+
     const login = await request(app.getHttpServer())
       .post("/auth/login")
       .send({
         email: "admin@example.com",
-        password: "admin123",
+        password: adminPassword,
       })
       .expect(200);
 

@@ -177,12 +177,35 @@ function generateDemoVehicle(
 // --------------------------------------------------
 
 async function main() {
+  const adminPassword = process.env.SEED_ADMIN_PASSWORD?.trim() ?? "";
+
   const alreadySeeded = await prisma.user.findUnique({
     where: { email: "admin@example.com" },
   });
 
   if (alreadySeeded) {
     console.log("Seed already applied; leaving existing data in place.");
+    return;
+  }
+
+  const demoAlreadyLoaded = (await prisma.vehicle.count()) > 0;
+
+  if (demoAlreadyLoaded) {
+    if (!adminPassword) {
+      console.log("SEED_ADMIN_PASSWORD is unset; skipping admin account.");
+      return;
+    }
+
+    await prisma.user.create({
+      data: {
+        name: "Admin",
+        email: "admin@example.com",
+        password: await bcrypt.hash(adminPassword, 10),
+        role: "admin",
+      },
+    });
+
+    console.log("Created admin account admin@example.com.");
     return;
   }
 
@@ -246,17 +269,20 @@ async function main() {
   // ADMIN USER
   // --------------------------------------------------
 
-  const admin = await prisma.user.create({
-    data: {
-      name: "Admin",
-      email: "admin@example.com",
-      password: await bcrypt.hash(
-        "admin123",
-        10,
-      ),
-      role: "admin",
-    },
-  });
+  let admin: { id: number } | null = null;
+
+  if (adminPassword) {
+    admin = await prisma.user.create({
+      data: {
+        name: "Admin",
+        email: "admin@example.com",
+        password: await bcrypt.hash(adminPassword, 10),
+        role: "admin",
+      },
+    });
+  } else {
+    console.log("SEED_ADMIN_PASSWORD is unset; skipping admin account.");
+  }
 
   // --------------------------------------------------
   // CLIENTS
@@ -371,7 +397,9 @@ async function main() {
   // HISTORICAL CSV SALES
   // --------------------------------------------------
 
-  const salesData = sales
+  const salesData = !admin
+    ? []
+    : sales
     .filter((s) => {
       const clientId =
         clientIdMap.get(
@@ -414,7 +442,7 @@ async function main() {
         ),
 
       userId:
-        admin.id,
+        admin!.id,
 
       clientId:
         clientIdMap.get(
@@ -540,6 +568,10 @@ async function main() {
 
   let vehicleIndex = 0;
 
+  if (!admin) {
+    console.log("Skipping generated sales because no admin account was created.");
+  }
+
   for (
     const [
       yearString,
@@ -551,9 +583,9 @@ async function main() {
     const year =
       Number(yearString);
 
-    for (
+      for (
       let i = 0;
-      i < numberOfSales;
+      i < numberOfSales && admin;
       i++
     ) {
       // Never sell one of the reserved
@@ -626,7 +658,7 @@ async function main() {
         deliveryDate,
 
         userId:
-          admin.id,
+          admin!.id,
 
         clientId,
 
