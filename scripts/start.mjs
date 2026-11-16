@@ -39,6 +39,10 @@ if (databaseUrl) {
   console.log("DATABASE_URL is unset; skipping migrations and seed.");
 }
 
+if (process.env.SETUP_ONLY === "1") {
+  process.exit(0);
+}
+
 const entry = ["dist/main.js", "dist/src/main.js"].find((candidate) =>
   existsSync(path.join(backend, candidate)),
 );
@@ -48,7 +52,15 @@ if (!entry) {
   process.exit(1);
 }
 
-const server = spawn("node", [entry], {
+const tsxHook = [
+  "node_modules/tsx/dist/cjs/index.cjs",
+  "node_modules/tsx/cjs/index.cjs",
+].find((candidate) => existsSync(path.join(backend, candidate)));
+
+const server = spawn(
+  "node",
+  tsxHook ? ["--require", `./${tsxHook}`, entry] : [entry],
+  {
   cwd: backend,
   stdio: "inherit",
   env: {
